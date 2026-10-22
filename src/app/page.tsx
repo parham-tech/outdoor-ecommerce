@@ -3,6 +3,8 @@ import { Hero } from '@/components/home/Hero';
 import { FeaturesBar } from '@/components/home/FeaturesBar';
 import { FeaturedCategories } from '@/components/home/FeaturedCategories';
 import { PromoBanner } from '@/components/home/PromoBanner';
+import { FeaturedProducts } from '@/components/home/FeaturedProducts';
+import { MOCK_FEATURED_PRODUCTS } from '@/data/mockProducts';
 
 export default function HomePage() {
   return (
@@ -16,6 +18,7 @@ export default function HomePage() {
         <FeaturesBar />
         <FeaturedCategories />
         <PromoBanner />
+        <FeaturedProducts products={MOCK_FEATURED_PRODUCTS} />
       </main>
     </div>
   );
