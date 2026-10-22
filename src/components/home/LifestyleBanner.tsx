@@ -1,10 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 
-export function PromoBanner() {
+export function LifestyleBanner() {
   return (
     <section
-      aria-labelledby="promo-banner-heading"
+      aria-labelledby="lifestyle-banner-heading"
       className="relative w-full min-h-[360px] sm:min-h-[420px] lg:min-h-[460px] flex items-center overflow-hidden"
     >
       {/* Background Alpine Lake & Mountain Sunrise Image */}
@@ -30,7 +30,7 @@ export function PromoBanner() {
           </p>
 
           <h2
-            id="promo-banner-heading"
+            id="lifestyle-banner-heading"
             className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1C3323] uppercase tracking-tight leading-tight font-sans mb-3 sm:mb-4 drop-shadow-xs"
           >
             GEAR FOR THE JOURNEY

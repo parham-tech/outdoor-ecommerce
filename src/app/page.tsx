@@ -2,7 +2,7 @@ import { Header } from '@/components/layout/Header';
 import { Hero } from '@/components/home/Hero';
 import { FeaturesBar } from '@/components/home/FeaturesBar';
 import { FeaturedCategories } from '@/components/home/FeaturedCategories';
-import { PromoBanner } from '@/components/home/PromoBanner';
+import { LifestyleBanner } from '@/components/home/LifestyleBanner';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { MOCK_FEATURED_PRODUCTS } from '@/data/mockProducts';
 
@@ -17,7 +17,7 @@ export default function HomePage() {
         <Hero />
         <FeaturesBar />
         <FeaturedCategories />
-        <PromoBanner />
+        <LifestyleBanner />
         <FeaturedProducts products={MOCK_FEATURED_PRODUCTS} />
       </main>
     </div>
