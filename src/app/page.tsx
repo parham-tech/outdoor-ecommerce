@@ -4,6 +4,7 @@ import { FeaturesBar } from '@/components/home/FeaturesBar';
 import { FeaturedCategories } from '@/components/home/FeaturedCategories';
 import { LifestyleBanner } from '@/components/home/LifestyleBanner';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
+import { GoFurtherBanner } from '@/components/home/GoFurtherBanner';
 import { MOCK_FEATURED_PRODUCTS } from '@/data/mockProducts';
 
 export default function HomePage() {
@@ -19,6 +20,7 @@ export default function HomePage() {
         <FeaturedCategories />
         <LifestyleBanner />
         <FeaturedProducts products={MOCK_FEATURED_PRODUCTS} />
+        <GoFurtherBanner />
       </main>
     </div>
   );
