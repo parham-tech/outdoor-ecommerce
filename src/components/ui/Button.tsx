@@ -23,7 +23,7 @@ export function Button({
 
   const variantStyles = {
     primary:
-      'bg-[#FA7109] text-white hover:bg-[#EA580C] active:bg-[#C2410C] shadow-lg shadow-orange-950/25 focus-visible:ring-offset-black/40',
+      'bg-[#A94900] text-white hover:bg-[#8F3E00] active:bg-[#753300] shadow-lg shadow-orange-950/25 focus-visible:ring-offset-black/40',
     secondary:
       'bg-[#2E4D36] text-white hover:bg-[#1C3323] active:bg-[#15271B] focus-visible:ring-offset-emerald-950',
     outline:
