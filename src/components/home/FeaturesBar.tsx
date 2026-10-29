@@ -56,45 +56,43 @@ export function FeaturesBar({ icons = {}, features = DEFAULT_FEATURES }: Feature
       className="w-full bg-[#F3F3F3] border-b border-black/5 py-8 sm:py-10 lg:py-12"
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 items-start">
-          {features.map((item, index) => {
-            const customIcon = icons[item.id];
-            // On 2-column mobile, center the 5th item across both columns
-            const isLastOnMobile = index === features.length - 1;
-
-            return (
+        <div className="grid grid-cols-6 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-8 items-start">          {features.map((item, index) => {
+          const customIcon = icons[item.id];
+          // On 2-column mobile, center the 5th item across both columns
+          const isBottomRow = index >= 3;
+          return (
+            <div
+              key={item.id}
+              className={`flex flex-col items-center text-center ${isBottomRow ? 'col-span-3' : 'col-span-2'
+                } md:col-span-1`}
+            >
+              {/* Icon container */}
               <div
-                key={item.id}
-                className={`flex flex-col items-center text-center ${isLastOnMobile ? 'col-span-2 md:col-span-1' : ''
-                  }`}
+                className="h-9 min-h-[36px] mb-2.5 sm:mb-3 flex items-center justify-center text-[#1C3323]"
+                aria-hidden="true"
               >
-                {/* Icon container */}
-                <div
-                  className="h-9 min-h-[36px] mb-2.5 sm:mb-3 flex items-center justify-center text-[#1C3323]"
-                  aria-hidden="true"
-                >
-                  {customIcon ?? (
-                    item.iconSrc ? (
-                      <Image
-                        src={item.iconSrc}
-                        alt=""
-                        width={38}
-                        height={38}
-                        className="h-8 sm:h-9 w-auto object-contain select-none pointer-events-none"
-                      />
-                    ) : null
-                  )}
-                </div>
-
-                <h3 className="text-sm sm:text-base font-bold text-[#1C3323] leading-snug font-sans">
-                  {item.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-[#2E4D36]/80 mt-1 leading-normal font-sans">
-                  {item.description}
-                </p>
+                {customIcon ?? (
+                  item.iconSrc ? (
+                    <Image
+                      src={item.iconSrc}
+                      alt=""
+                      width={38}
+                      height={38}
+                      className=" h-7 sm:h-9 w-auto object-contain select-none pointer-events-none"
+                    />
+                  ) : null
+                )}
               </div>
-            );
-          })}
+
+              <h3 className="text-xs sm:text-base font-bold text-[#1C3323] leading-snug font-sans">
+                {item.title}
+              </h3>
+              <p className="text-[10px] sm:text-sm text-[#2E4D36]/80 mt-1 leading-normal font-sans">
+                {item.description}
+              </p>
+            </div>
+          );
+        })}
         </div>
       </div>
     </section>
