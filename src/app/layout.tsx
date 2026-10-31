@@ -16,6 +16,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('http://localhost:3000'),
   title: 'Ridge & River | Technical Outdoor Equipment & Apparel',
   description: 'Expedition-grade apparel and gear crafted for the backcountry. Built for endurance, engineered for the wild.',
 };
