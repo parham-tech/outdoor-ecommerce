@@ -8,6 +8,11 @@
   --color-warm-cream: #EDE8DE;
   --color-accent-amber: #D97706;
   --color-accent-rust: #B45309;
+  --color-brand-orange: #f97316;
+  --color-brand-orange-hover: #ea580c;
+  --color-brand-dark: #0b121c;
+  --color-brand-navy: #0f172a;
+  --color-brand-gray-bg: #f8fafc;
   --font-serif: var(--font-playfair), Georgia, serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
@@ -23,3 +28,13 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
 }
+
+/* Hide scrollbar for category pill rails */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

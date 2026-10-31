@@ -8,3 +8,15 @@ export interface FeaturedProduct {
   rating?: number | null;
   reviewCount?: number | null;
 }
+
+export interface ShopProduct extends FeaturedProduct {
+  category: string;
+  specs?: string;
+  badge?: string;
+  colorSwatches?: string[];
+  colorCount?: number;
+  activity?: string[];
+  features?: string[];
+  inStock?: boolean;
+}
+

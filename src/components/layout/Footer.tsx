@@ -3,11 +3,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const SHOP_LINKS = [
-  { label: 'Tents & Shelters', href: '/#featured-categories-heading' },
-  { label: 'backpacks', href: '/#featured-categories-heading' },
-  { label: 'Camping Kitchen', href: '/#featured-categories-heading' },
-  { label: 'Lightning', href: '/#featured-categories-heading' },
+  { label: 'Tents & Shelters', href: '/shop' },
+  { label: 'Backpacks', href: '/shop' },
+  { label: 'Camping Kitchen', href: '/shop' },
+  { label: 'Lighting', href: '/shop' },
 ] as const;
+
 
 const ABOUT_LINKS = [
   { label: 'Our Story', href: '/#lifestyle-banner-heading' },
