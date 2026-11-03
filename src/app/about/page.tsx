@@ -1,7 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
-import { ShopNotificationBar } from '@/components/shop/ShopNotificationBar';
 import { AboutHero } from '@/components/about/AboutHero';
 import { AboutStory } from '@/components/about/AboutStory';
 import { AboutValues } from '@/components/about/AboutValues';
@@ -22,10 +21,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-800 antialiased selection:bg-orange-500 selection:text-white">
-      {/* 1. Global Announcement / Notification Bar */}
-      <ShopNotificationBar />
-
-      {/* 2. Global Navigation Header (Solid Midnight Variant with active /about link) */}
+      {/* 1. Global Navigation Header (Solid Midnight Variant with active /about link) */}
       <Header variant="solid" activeHref="/about" />
 
       {/* 3. Main Page Content */}

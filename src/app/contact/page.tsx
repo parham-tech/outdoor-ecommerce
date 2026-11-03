@@ -1,7 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
-import { ShopNotificationBar } from '@/components/shop/ShopNotificationBar';
 import { ContactHero } from '@/components/contact/ContactHero';
 import { ContactMainSection } from '@/components/contact/ContactMainSection';
 import { ContactQuickHelp } from '@/components/contact/ContactQuickHelp';
@@ -21,10 +20,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-800 antialiased selection:bg-orange-500 selection:text-white">
-      {/* 1. Global Announcement / Notification Bar */}
-      <ShopNotificationBar />
-
-      {/* 2. Global Navigation Header (Solid Midnight Variant with active /contact link) */}
+      {/* 1. Global Navigation Header (Solid Midnight Variant with active /contact link) */}
       <Header variant="solid" activeHref="/contact" />
 
       {/* 3. Main Page Content */}
