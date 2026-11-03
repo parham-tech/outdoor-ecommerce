@@ -360,7 +360,7 @@ export function ShopFilterSidebar({
           Our outdoor team can help you find the right gear.
         </p>
         <Link
-          href="/#contact"
+          href="/contact"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 hover:text-orange-600 pt-1 group focus-visible:outline-none focus-visible:underline"
         >
           <span>Talk to a gear expert</span>

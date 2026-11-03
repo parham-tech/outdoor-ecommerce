@@ -14,7 +14,7 @@ const ABOUT_LINKS = [
   { label: 'Our Story', href: '/about' },
   { label: 'Sustainablity', href: '/#go-further-banner-heading' },
   { label: 'Blog', href: '/#featured-products-heading' },
-  { label: 'Contact', href: '/#newsletter-heading' },
+  { label: 'Contact', href: '/contact' },
 ] as const;
 
 const SUPPORT_LINKS = [
