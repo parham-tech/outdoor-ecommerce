@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export interface HeaderProps {
   /** Optional slot for custom or injected utility actions */
@@ -28,6 +28,7 @@ export function Header({
   activeHref,
   cartCount = 0,
 }: HeaderProps) {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -141,8 +142,11 @@ export function Header({
             >
               {NAV_LINKS.map((link) => {
                 const isActive =
-                  activeHref === link.href ||
-                  (activeHref === undefined && link.href === '/');
+                  activeHref !== undefined
+                    ? activeHref === link.href
+                    : link.href === '/'
+                    ? pathname === '/'
+                    : pathname === link.href || (link.href === '/shop' && pathname.startsWith('/products'));
                 return (
                   <Link
                     key={link.label}
@@ -225,7 +229,7 @@ export function Header({
 
             {/* Account Icon */}
             <Link
-              href="/#about"
+              href="/login"
               className="p-1.5 sm:p-2 text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm shrink-0"
               aria-label="Account"
               title="Account"
@@ -411,8 +415,11 @@ export function Header({
             <nav aria-label="Mobile Navigation Links" className="flex-1 py-5 space-y-1.5 overflow-y-auto">
               {NAV_LINKS.map((link) => {
                 const isActive =
-                  activeHref === link.href ||
-                  (activeHref === undefined && link.href === '/');
+                  activeHref !== undefined
+                    ? activeHref === link.href
+                    : link.href === '/'
+                    ? pathname === '/'
+                    : pathname === link.href || (link.href === '/shop' && pathname.startsWith('/products'));
                 return (
                   <Link
                     key={link.label}
