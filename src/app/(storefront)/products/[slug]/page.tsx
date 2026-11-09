@@ -84,6 +84,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="lg:col-span-5">
             <ProductPurchaseForm
               productId={product.id}
+              slug={product.slug}
               productName={product.name}
               category={product.category}
               priceInCents={product.priceInCents}

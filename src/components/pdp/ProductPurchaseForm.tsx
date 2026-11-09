@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { ProductColorOption } from '@/types/product';
 import { formatCurrency } from '@/lib/utils/format';
+import { useCart } from '@/context/CartContext';
 
 export interface ProductPurchaseFormProps {
   productId: string;
+  slug: string;
   productName: string;
   category: string;
   priceInCents: number;
@@ -19,6 +21,8 @@ export interface ProductPurchaseFormProps {
 }
 
 export function ProductPurchaseForm({
+  productId,
+  slug,
   productName,
   category,
   priceInCents,
@@ -30,6 +34,7 @@ export function ProductPurchaseForm({
   sku,
   inStock = true,
 }: ProductPurchaseFormProps) {
+  const { addItem, isHydrated } = useCart();
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedCapacityIndex, setSelectedCapacityIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -40,8 +45,21 @@ export function ProductPurchaseForm({
   const hasReviews = typeof rating === 'number' && rating > 0 && typeof reviewCount === 'number';
 
   const handleAddToCart = () => {
-    setAddedToast(true);
-    setTimeout(() => setAddedToast(false), 2200);
+    if (!inStock || !isHydrated) return;
+
+    const wasAdded = addItem({
+      productId,
+      slug,
+      quantity,
+      selectedColor: colors.length > 0 && selectedColor ? selectedColor.name : undefined,
+      selectedCapacity:
+        capacityOptions.length > 0 ? capacityOptions[selectedCapacityIndex] : undefined,
+    });
+
+    if (wasAdded) {
+      setAddedToast(true);
+      setTimeout(() => setAddedToast(false), 2200);
+    }
   };
 
   const handleQuantityDecrease = () => {
@@ -227,7 +245,9 @@ export function ProductPurchaseForm({
         <button
           type="button"
           onClick={handleAddToCart}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#e86c1e] hover:bg-[#cf5b15] active:bg-[#b54c0e] text-white text-sm font-bold py-3.5 px-6 rounded-lg shadow-sm transition-all duration-150 transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+          disabled={!inStock || !isHydrated}
+          aria-disabled={!inStock || !isHydrated}
+          className="flex-1 flex items-center justify-center gap-2 bg-[#e86c1e] hover:bg-[#cf5b15] active:bg-[#b54c0e] text-white text-sm font-bold py-3.5 px-6 rounded-lg shadow-sm transition-all duration-150 transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
         >
           <svg className="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -237,7 +257,15 @@ export function ProductPurchaseForm({
               strokeWidth="2"
             />
           </svg>
-          <span>{addedToast ? 'Added to Cart ✓' : 'Add to Cart'}</span>
+          <span>
+            {!inStock
+              ? 'Out of Stock'
+              : !isHydrated
+              ? 'Loading...'
+              : addedToast
+              ? 'Added to Cart ✓'
+              : 'Add to Cart'}
+          </span>
         </button>
       </div>
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 
 export interface HeaderProps {
   /** Optional slot for custom or injected utility actions */
@@ -26,9 +27,11 @@ const NAV_LINKS = [
 export function Header({
   actions,
   activeHref,
-  cartCount = 0,
+  cartCount: controlledCartCount,
 }: HeaderProps) {
   const pathname = usePathname();
+  const { itemCount, openDrawer, isHydrated } = useCart();
+  const displayCartCount = isHydrated ? (controlledCartCount ?? itemCount) : 0;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -244,10 +247,11 @@ export function Header({
             </Link>
 
             {/* Cart Bag with Badge */}
-            <Link
-              href="/shop#catalog"
-              className="flex items-center gap-1.5 p-1.5 sm:p-2 text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm shrink-0"
-              aria-label={`Shopping cart with ${cartCount} items`}
+            <button
+              type="button"
+              onClick={openDrawer}
+              className="flex items-center gap-1.5 p-1.5 sm:p-2 text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm shrink-0 cursor-pointer"
+              aria-label={`Open shopping cart with ${displayCartCount} items`}
               title="Cart"
             >
               <div className="relative shrink-0">
@@ -260,9 +264,9 @@ export function Header({
                 />
               </div>
               <span className="text-xs sm:text-sm font-semibold text-slate-200 shrink-0">
-                {cartCount}
+                {displayCartCount}
               </span>
-            </Link>
+            </button>
 
             {/* Mobile Menu Hamburger Toggle */}
             <button
@@ -442,10 +446,14 @@ export function Header({
 
             {/* Drawer Footer with Quick Utilities */}
             <div className="pt-4 border-t border-white/10 text-xs text-slate-400 space-y-2 shrink-0">
-              <Link
-                href="/shop#catalog"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px]"
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  openDrawer();
+                }}
+                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] cursor-pointer"
+                aria-label={`Open shopping cart with ${displayCartCount} items`}
               >
                 <span className="flex items-center gap-2 font-medium">
                   <Image
@@ -458,9 +466,9 @@ export function Header({
                   Shopping Cart
                 </span>
                 <span className="font-bold text-white bg-orange-600 px-2 py-0.5 rounded-full text-[11px]">
-                  {cartCount} items
+                  {displayCartCount} {displayCartCount === 1 ? 'item' : 'items'}
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
         </div>

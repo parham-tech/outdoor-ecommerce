@@ -95,7 +95,7 @@ export interface CartContextValue {
   closeDrawer: () => void;
   toggleDrawer: () => void;
   clearNotification: () => void;
-  addItem: (payload: AddItemPayload) => void;
+  addItem: (payload: AddItemPayload) => boolean;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;

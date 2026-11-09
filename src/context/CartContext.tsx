@@ -435,15 +435,15 @@ export function CartProvider({ children }: CartProviderProps) {
 
   // Cart Actions
   const addItem = useCallback(
-    (payload: AddItemPayload) => {
+    (payload: AddItemPayload): boolean => {
       if (!isHydrated) {
         showNotification('info', 'Cart is initializing, please try again in a moment.');
-        return;
+        return false;
       }
 
       if (!isValidQuantity(payload.quantity)) {
         showNotification('error', 'Quantity must be a positive integer.');
-        return;
+        return false;
       }
 
       const { isValid, product, error, normalizedColor, normalizedCapacity } =
@@ -451,13 +451,13 @@ export function CartProvider({ children }: CartProviderProps) {
 
       if (!isValid || !product) {
         showNotification('error', error || 'Failed to add item to cart.');
-        return;
+        return false;
       }
 
       const stock = resolveStockAvailability(product);
       if (!stock.isAvailable) {
         showNotification('error', `${product.name} is currently out of stock.`);
-        return;
+        return false;
       }
 
       const id = createCartItemId(product.id, normalizedColor, normalizedCapacity);
@@ -475,28 +475,28 @@ export function CartProvider({ children }: CartProviderProps) {
         const cappedQty = Math.min(targetQty, stock.maxSelectableQuantity);
 
         if (cappedQty === existing.quantity) {
+          showNotification(
+            'info',
+            `Maximum available quantity (${stock.maxSelectableQuantity}) reached for ${product.name}.`
+          );
+          return false;
+        }
+
+        if (cappedQty < targetQty) {
           pendingNotification = {
             type: 'info',
-            message: `Maximum available quantity (${stock.maxSelectableQuantity}) reached for ${product.name}.`,
-          };
-          nextItems = currentItems;
-        } else {
-          if (cappedQty < targetQty) {
-            pendingNotification = {
-              type: 'info',
-              message: `Added ${cappedQty - existing.quantity} unit(s). Reached maximum limit of ${stock.maxSelectableQuantity}.`,
-            };
-          }
-          nextItems = [...currentItems];
-          nextItems[existingIndex] = {
-            ...existing,
-            quantity: cappedQty,
-            priceInCents: product.priceInCents, // Sync live price
-            name: product.name,
-            imageUrl: product.imageUrl,
-            maxSelectableQuantity: stock.maxSelectableQuantity,
+            message: `Added ${cappedQty - existing.quantity} unit(s). Reached maximum limit of ${stock.maxSelectableQuantity}.`,
           };
         }
+        nextItems = [...currentItems];
+        nextItems[existingIndex] = {
+          ...existing,
+          quantity: cappedQty,
+          priceInCents: product.priceInCents, // Sync live price
+          name: product.name,
+          imageUrl: product.imageUrl,
+          maxSelectableQuantity: stock.maxSelectableQuantity,
+        };
       } else {
         const initialQty = Math.min(payload.quantity, stock.maxSelectableQuantity);
         if (initialQty < payload.quantity) {
@@ -534,6 +534,8 @@ export function CartProvider({ children }: CartProviderProps) {
       if (pendingNotification) {
         showNotification(pendingNotification.type, pendingNotification.message);
       }
+
+      return true;
     },
     [isHydrated, showNotification]
   );
