@@ -11,6 +11,9 @@ export const PRICING_CONFIG = {
   /** Standard shipping cost in integer cents ($5.00) */
   STANDARD_SHIPPING_CENTS: 500,
 
+  /** Express shipping cost in integer cents ($15.00) */
+  EXPRESS_SHIPPING_CENTS: 1500,
+
   /** Free standard shipping threshold in integer cents ($75.00) */
   FREE_SHIPPING_THRESHOLD_CENTS: 7500,
 } as const;

@@ -1,5 +1,7 @@
 import { PRICING_CONFIG } from '../../config/pricing';
 
+export type ShippingTier = 'standard' | 'express';
+
 export interface CartPricingSummary {
   /** Cart items subtotal in integer cents */
   subtotalInCents: number;
@@ -7,7 +9,7 @@ export interface CartPricingSummary {
   /** Estimated sales tax in integer cents */
   taxInCents: number;
 
-  /** Standard shipping fee in integer cents ($5.00 or $0.00 if qualified/empty) */
+  /** Shipping fee in integer cents ($5.00, $15.00, or $0.00 if qualified/empty) */
   shippingInCents: number;
 
   /** Grand total in integer cents (subtotal + tax + shipping) */
@@ -24,6 +26,9 @@ export interface CartPricingSummary {
 
   /** The free shipping threshold in integer cents */
   freeShippingThresholdInCents: number;
+
+  /** The active shipping tier applied to this calculation */
+  shippingTier: ShippingTier;
 }
 
 export interface PricingItemInput {
@@ -121,7 +126,49 @@ export function calculateTax(
 }
 
 /**
+ * Validates that a shipping tier is supported ('standard' or 'express').
+ */
+export function validateShippingTier(tier: unknown): asserts tier is ShippingTier {
+  if (typeof tier !== 'string') {
+    throw new TypeError('Shipping tier must be a string.');
+  }
+  if (tier !== 'standard' && tier !== 'express') {
+    throw new RangeError(`Unsupported shipping tier "${tier}". Expected 'standard' or 'express'.`);
+  }
+}
+
+/**
+ * Calculates shipping cost based on the subtotal, selected shipping tier, and free shipping threshold.
+ * - Empty cart ($0): $0.00
+ * - Standard tier:
+ *   - Subtotal >= threshold: $0.00 (FREE)
+ *   - Subtotal < threshold: $5.00 (STANDARD_SHIPPING_CENTS)
+ * - Express tier:
+ *   - $15.00 (EXPRESS_SHIPPING_CENTS) regardless of subtotal (never waived by threshold)
+ */
+export function calculateShipping(
+  subtotalInCents: number,
+  shippingTier: ShippingTier = 'standard',
+  thresholdInCents: number = PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS
+): number {
+  validateMonetaryCents(subtotalInCents, 'Subtotal');
+  validateShippingTier(shippingTier);
+  validateMonetaryCents(thresholdInCents, 'Threshold');
+
+  if (subtotalInCents === 0) {
+    return 0;
+  }
+
+  if (shippingTier === 'express') {
+    return PRICING_CONFIG.EXPRESS_SHIPPING_CENTS;
+  }
+
+  return subtotalInCents >= thresholdInCents ? 0 : PRICING_CONFIG.STANDARD_SHIPPING_CENTS;
+}
+
+/**
  * Calculates standard shipping cost based on the subtotal and free shipping threshold.
+ * Preserved for backward compatibility.
  * - Empty cart: $0.00
  * - Subtotal >= threshold: $0.00 (FREE)
  * - Subtotal < threshold: $5.00 (STANDARD_SHIPPING_CENTS)
@@ -130,14 +177,16 @@ export function calculateStandardShipping(
   subtotalInCents: number,
   thresholdInCents: number = PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS
 ): number {
-  validateMonetaryCents(subtotalInCents, 'Subtotal');
-  validateMonetaryCents(thresholdInCents, 'Threshold');
+  return calculateShipping(subtotalInCents, 'standard', thresholdInCents);
+}
 
-  if (subtotalInCents === 0) {
-    return 0;
-  }
-
-  return subtotalInCents >= thresholdInCents ? 0 : PRICING_CONFIG.STANDARD_SHIPPING_CENTS;
+/**
+ * Calculates express shipping cost based on the subtotal.
+ * - Empty cart: $0.00
+ * - Subtotal > 0: $15.00 (EXPRESS_SHIPPING_CENTS) regardless of threshold
+ */
+export function calculateExpressShipping(subtotalInCents: number): number {
+  return calculateShipping(subtotalInCents, 'express');
 }
 
 /**
@@ -179,11 +228,34 @@ export function calculateFreeShippingProgress(
 
 /**
  * Computes a complete, immutable pricing summary from subtotal in cents or cart items.
+ *
+ * Backward-compatible parameter handling:
+ * - calculateCartPricing(items) -> tier: 'standard', threshold: 7500
+ * - calculateCartPricing(subtotal) -> tier: 'standard', threshold: 7500
+ * - calculateCartPricing(subtotal, 'express') -> tier: 'express', threshold: 7500
+ * - calculateCartPricing(subtotal, 'standard', threshold) -> tier: 'standard', threshold
+ * - calculateCartPricing(subtotal, thresholdNumber) -> tier: 'standard', thresholdNumber
  */
 export function calculateCartPricing(
   input: number | readonly PricingItemInput[],
-  thresholdInCents: number = PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS
+  shippingTierOrThreshold?: ShippingTier | number,
+  thresholdInCentsParam?: number
 ): CartPricingSummary {
+  let shippingTier: ShippingTier = 'standard';
+  let thresholdInCents: number = PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS;
+
+  if (typeof shippingTierOrThreshold === 'number') {
+    thresholdInCents = shippingTierOrThreshold;
+  } else if (typeof shippingTierOrThreshold === 'string') {
+    validateShippingTier(shippingTierOrThreshold);
+    shippingTier = shippingTierOrThreshold;
+    if (typeof thresholdInCentsParam === 'number') {
+      thresholdInCents = thresholdInCentsParam;
+    }
+  } else if (shippingTierOrThreshold !== undefined) {
+    validateShippingTier(shippingTierOrThreshold);
+  }
+
   const subtotalInCents = typeof input === 'number' ? input : calculateSubtotal(input);
 
   validateMonetaryCents(subtotalInCents, 'Subtotal');
@@ -192,7 +264,7 @@ export function calculateCartPricing(
   const qualifiesForFreeShipping = subtotalInCents >= thresholdInCents;
   const remainingForFreeShippingInCents = calculateRemainingForFreeShipping(subtotalInCents, thresholdInCents);
   const freeShippingProgress = calculateFreeShippingProgress(subtotalInCents, thresholdInCents);
-  const shippingInCents = calculateStandardShipping(subtotalInCents, thresholdInCents);
+  const shippingInCents = calculateShipping(subtotalInCents, shippingTier, thresholdInCents);
   const taxInCents = calculateTax(subtotalInCents);
   const totalInCents = subtotalInCents + taxInCents + shippingInCents;
   if (!Number.isSafeInteger(totalInCents)) {
@@ -208,5 +280,6 @@ export function calculateCartPricing(
     freeShippingProgress,
     qualifiesForFreeShipping,
     freeShippingThresholdInCents: thresholdInCents,
+    shippingTier,
   };
 }
