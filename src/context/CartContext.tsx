@@ -20,12 +20,21 @@ import type {
 } from '@/types/cart';
 import type { ProductDetail } from '@/types/product';
 import { getProductDetailBySlug } from '@/data/productDetails';
-import { calculateCartPricing } from '@/lib/pricing/cartPricing';
+import {
+  calculateCartPricing,
+  validateShippingTier,
+  type ShippingTier,
+} from '@/lib/pricing/cartPricing';
 
 /**
  * Versioned localStorage storage key.
  */
 export const CART_STORAGE_KEY = 'altitude_cart_v1';
+
+/**
+ * Storage key for persisting selected shipping tier.
+ */
+export const SHIPPING_TIER_STORAGE_KEY = 'altitude_shipping_tier_v1';
 
 /**
  * Temporary Frontend-Only Demonstration Order Limit.
@@ -221,6 +230,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [shippingTier, setShippingTierState] = useState<ShippingTier>('standard');
   const [notification, setNotification] = useState<CartNotification | null>(null);
 
   const notificationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -248,163 +258,176 @@ export function CartProvider({ children }: CartProviderProps) {
   // 1. Client-side Hydration & Catalog Reconciliation on Mount
   useEffect(() => {
     const timer = setTimeout(() => {
+      // --- 1. Reconcile Shipping Tier ---
+      // Isolated restoration: always restores a valid tier regardless of cart items data state.
+      let restoredTier: ShippingTier = 'standard';
       try {
-        const storedJson = localStorage.getItem(CART_STORAGE_KEY);
-        if (!storedJson) {
-          setIsHydrated(true);
-          return;
-        }
-
-        const parsed: unknown = JSON.parse(storedJson);
-        if (!Array.isArray(parsed)) {
-          setIsHydrated(true);
-          return;
-        }
-
-        const reconciledItems: CartItem[] = [];
-        const itemMap = new Map<string, CartItem>();
-        let hadUnavailableItems = false;
-        let hadAdjustedQuantities = false;
-
-        for (const raw of parsed) {
-          if (
-            typeof raw !== 'object' ||
-            raw === null ||
-            typeof raw.productId !== 'string' ||
-            typeof raw.slug !== 'string' ||
-            !isValidQuantity(raw.quantity)
-          ) {
-            continue;
-          }
-
-          const product = getProductDetailBySlug(raw.slug.trim());
-          // Verify existence and ID consistency against authoritative storefront catalog
-          if (!product || product.id !== raw.productId.trim()) {
-            hadUnavailableItems = true;
-            continue;
-          }
-
-          const stock = resolveStockAvailability(product);
-          if (!stock.isAvailable) {
-            hadUnavailableItems = true;
-            continue;
-          }
-
-          // Validate persisted color selection against authoritative product data
-          let validColor: string | undefined;
-          const hasColors = Boolean(product.colors && product.colors.length > 0);
-          if (raw.selectedColor !== undefined && raw.selectedColor !== null) {
-            if (typeof raw.selectedColor !== 'string') {
-              hadUnavailableItems = true;
-              continue;
-            }
-            const trimmedColor = raw.selectedColor.trim();
-            if (trimmedColor) {
-              if (!hasColors) {
-                hadUnavailableItems = true;
-                continue;
-              }
-              const match = product.colors!.find(
-                (c) => c.name.toLowerCase() === trimmedColor.toLowerCase()
-              );
-              if (!match) {
-                hadUnavailableItems = true;
-                continue;
-              }
-              validColor = match.name;
-            }
-          }
-
-          // Validate persisted capacity selection against authoritative product data
-          let validCapacity: string | undefined;
-          const hasCapacities = Boolean(product.capacityOptions && product.capacityOptions.length > 0);
-          if (raw.selectedCapacity !== undefined && raw.selectedCapacity !== null) {
-            if (typeof raw.selectedCapacity !== 'string') {
-              hadUnavailableItems = true;
-              continue;
-            }
-            const trimmedCapacity = raw.selectedCapacity.trim();
-            if (trimmedCapacity) {
-              if (!hasCapacities) {
-                hadUnavailableItems = true;
-                continue;
-              }
-              const match = product.capacityOptions!.find(
-                (opt) => opt.toLowerCase() === trimmedCapacity.toLowerCase()
-              );
-              if (!match) {
-                hadUnavailableItems = true;
-                continue;
-              }
-              validCapacity = match;
-            }
-          }
-
-          const id = createCartItemId(product.id, validColor, validCapacity);
-          const maxLimit = stock.maxSelectableQuantity;
-
-          if (raw.quantity > maxLimit) {
-            hadAdjustedQuantities = true;
-          }
-
-          const safeQuantity = Math.min(raw.quantity, maxLimit);
-
-          // Deduplicate in case multiple persisted items resolve to the same canonical ID
-          if (itemMap.has(id)) {
-            const existing = itemMap.get(id)!;
-            const targetMergedQty = existing.quantity + safeQuantity;
-            if (targetMergedQty > maxLimit) {
-              hadAdjustedQuantities = true;
-            }
-            existing.quantity = Math.min(targetMergedQty, maxLimit);
-          } else {
-            const newItem: CartItem = {
-              id,
-              productId: product.id,
-              slug: product.slug,
-              name: product.name,
-              category: product.category,
-              priceInCents: product.priceInCents, // Live price from catalog
-              imageUrl: product.imageUrl, // Live asset from catalog
-              selectedColor: validColor,
-              selectedCapacity: validCapacity,
-              quantity: safeQuantity,
-              maxSelectableQuantity: maxLimit,
-              isAvailable: true,
-              hasExactInventory: stock.hasExactInventory,
-              exactInventory: stock.exactInventory,
-              sku: product.sku,
-            };
-            itemMap.set(id, newItem);
-            reconciledItems.push(newItem);
-          }
-        }
-
-        itemsRef.current = reconciledItems;
-        setItems(reconciledItems);
-        setIsHydrated(true);
-
-        if (hadUnavailableItems) {
-          showNotification(
-            'warning',
-            'One or more items in your cart are no longer available and were removed.'
-          );
-        } else if (hadAdjustedQuantities) {
-          showNotification(
-            'info',
-            'Some item quantities were adjusted to maximum available limits.'
-          );
+        const storedTier = localStorage.getItem(SHIPPING_TIER_STORAGE_KEY);
+        if (storedTier === 'standard' || storedTier === 'express') {
+          restoredTier = storedTier;
         }
       } catch {
-        // Safe fallback: gracefully initialize with empty cart if storage access fails
-        setIsHydrated(true);
+        // Safe fallback to 'standard' if localStorage access throws (e.g. private browsing)
+      }
+
+      // --- 2. Reconcile Cart Items ---
+      // Isolated reconciliation: failures in cart JSON parsing or catalog lookup
+      // gracefully fall back to an empty cart without aborting tier restoration.
+      const reconciledItems: CartItem[] = [];
+      let hadUnavailableItems = false;
+      let hadAdjustedQuantities = false;
+
+      try {
+        const storedJson = localStorage.getItem(CART_STORAGE_KEY);
+        if (storedJson) {
+          const parsed: unknown = JSON.parse(storedJson);
+          if (Array.isArray(parsed)) {
+            const itemMap = new Map<string, CartItem>();
+
+            for (const raw of parsed) {
+              if (
+                typeof raw !== 'object' ||
+                raw === null ||
+                typeof raw.productId !== 'string' ||
+                typeof raw.slug !== 'string' ||
+                !isValidQuantity(raw.quantity)
+              ) {
+                continue;
+              }
+
+              const product = getProductDetailBySlug(raw.slug.trim());
+              // Verify existence and ID consistency against authoritative storefront catalog
+              if (!product || product.id !== raw.productId.trim()) {
+                hadUnavailableItems = true;
+                continue;
+              }
+
+              const stock = resolveStockAvailability(product);
+              if (!stock.isAvailable) {
+                hadUnavailableItems = true;
+                continue;
+              }
+
+              // Validate persisted color selection against authoritative product data
+              let validColor: string | undefined;
+              const hasColors = Boolean(product.colors && product.colors.length > 0);
+              if (raw.selectedColor !== undefined && raw.selectedColor !== null) {
+                if (typeof raw.selectedColor !== 'string') {
+                  hadUnavailableItems = true;
+                  continue;
+                }
+                const trimmedColor = raw.selectedColor.trim();
+                if (trimmedColor) {
+                  if (!hasColors) {
+                    hadUnavailableItems = true;
+                    continue;
+                  }
+                  const match = product.colors!.find(
+                    (c) => c.name.toLowerCase() === trimmedColor.toLowerCase()
+                  );
+                  if (!match) {
+                    hadUnavailableItems = true;
+                    continue;
+                  }
+                  validColor = match.name;
+                }
+              }
+
+              // Validate persisted capacity selection against authoritative product data
+              let validCapacity: string | undefined;
+              const hasCapacities = Boolean(product.capacityOptions && product.capacityOptions.length > 0);
+              if (raw.selectedCapacity !== undefined && raw.selectedCapacity !== null) {
+                if (typeof raw.selectedCapacity !== 'string') {
+                  hadUnavailableItems = true;
+                  continue;
+                }
+                const trimmedCapacity = raw.selectedCapacity.trim();
+                if (trimmedCapacity) {
+                  if (!hasCapacities) {
+                    hadUnavailableItems = true;
+                    continue;
+                  }
+                  const match = product.capacityOptions!.find(
+                    (opt) => opt.toLowerCase() === trimmedCapacity.toLowerCase()
+                  );
+                  if (!match) {
+                    hadUnavailableItems = true;
+                    continue;
+                  }
+                  validCapacity = match;
+                }
+              }
+
+              const id = createCartItemId(product.id, validColor, validCapacity);
+              const maxLimit = stock.maxSelectableQuantity;
+
+              if (raw.quantity > maxLimit) {
+                hadAdjustedQuantities = true;
+              }
+
+              const safeQuantity = Math.min(raw.quantity, maxLimit);
+
+              // Deduplicate in case multiple persisted items resolve to the same canonical ID
+              if (itemMap.has(id)) {
+                const existing = itemMap.get(id)!;
+                const targetMergedQty = existing.quantity + safeQuantity;
+                if (targetMergedQty > maxLimit) {
+                  hadAdjustedQuantities = true;
+                }
+                existing.quantity = Math.min(targetMergedQty, maxLimit);
+              } else {
+                const newItem: CartItem = {
+                  id,
+                  productId: product.id,
+                  slug: product.slug,
+                  name: product.name,
+                  category: product.category,
+                  priceInCents: product.priceInCents, // Live price from catalog
+                  imageUrl: product.imageUrl, // Live asset from catalog
+                  selectedColor: validColor,
+                  selectedCapacity: validCapacity,
+                  quantity: safeQuantity,
+                  maxSelectableQuantity: maxLimit,
+                  isAvailable: true,
+                  hasExactInventory: stock.hasExactInventory,
+                  exactInventory: stock.exactInventory,
+                  sku: product.sku,
+                };
+                itemMap.set(id, newItem);
+                reconciledItems.push(newItem);
+              }
+            }
+          }
+        }
+      } catch {
+        // Safe fallback: corrupted JSON or catalog access errors gracefully default to empty cart
+      }
+
+      // --- 3. Atomic State Commit ---
+      // Guaranteed to set both items and restoredTier before isHydrated becomes true,
+      // regardless of whether cart item data was valid, corrupted, or empty.
+      itemsRef.current = reconciledItems;
+      setItems(reconciledItems);
+      setShippingTierState(restoredTier);
+      setIsHydrated(true);
+
+      if (hadUnavailableItems) {
+        showNotification(
+          'warning',
+          'One or more items in your cart are no longer available and were removed.'
+        );
+      } else if (hadAdjustedQuantities) {
+        showNotification(
+          'info',
+          'Some item quantities were adjusted to maximum available limits.'
+        );
       }
     }, 0);
 
     return () => clearTimeout(timer);
   }, [showNotification]);
 
-  // 2. LocalStorage Persistence Guard
+  // 2. LocalStorage Persistence Guard for Cart Items
   // CRITICAL: Prevent writing to storage until client-side hydration has completed.
   useEffect(() => {
     if (!isHydrated) return;
@@ -423,6 +446,18 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, [items, isHydrated]);
 
+  // 3. LocalStorage Persistence Guard for Shipping Tier
+  // CRITICAL: Prevent writing to storage until client-side hydration has completed.
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    try {
+      localStorage.setItem(SHIPPING_TIER_STORAGE_KEY, shippingTier);
+    } catch {
+      // Fail safely if quota exceeded or storage blocked in private browsing
+    }
+  }, [shippingTier, isHydrated]);
+
   // Computed totals (pure integer-cent arithmetic)
   const itemCount = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
@@ -435,9 +470,14 @@ export function CartProvider({ children }: CartProviderProps) {
   );
 
   const pricing = useMemo(
-    () => calculateCartPricing(subtotalInCents),
-    [subtotalInCents]
+    () => calculateCartPricing(subtotalInCents, shippingTier),
+    [subtotalInCents, shippingTier]
   );
+
+  const setShippingTier = useCallback((tier: ShippingTier) => {
+    validateShippingTier(tier);
+    setShippingTierState(tier);
+  }, []);
 
   // Cart Actions
   const addItem = useCallback(
@@ -600,6 +640,7 @@ export function CartProvider({ children }: CartProviderProps) {
     if (!isHydrated) return;
     itemsRef.current = [];
     setItems([]);
+    setShippingTierState('standard');
   }, [isHydrated]);
 
   const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
@@ -612,6 +653,7 @@ export function CartProvider({ children }: CartProviderProps) {
       itemCount,
       subtotalInCents,
       pricing,
+      shippingTier,
       isDrawerOpen,
       isHydrated,
       notification,
@@ -623,12 +665,14 @@ export function CartProvider({ children }: CartProviderProps) {
       removeItem,
       updateQuantity,
       clearCart,
+      setShippingTier,
     }),
     [
       items,
       itemCount,
       subtotalInCents,
       pricing,
+      shippingTier,
       isDrawerOpen,
       isHydrated,
       notification,
@@ -640,6 +684,7 @@ export function CartProvider({ children }: CartProviderProps) {
       removeItem,
       updateQuantity,
       clearCart,
+      setShippingTier,
     ]
   );
 

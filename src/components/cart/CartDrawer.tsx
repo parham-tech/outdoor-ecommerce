@@ -370,7 +370,9 @@ export function CartDrawer() {
               </div>
 
               <div className="flex items-center justify-between text-slate-600">
-                <span>Standard Shipping</span>
+                <span>
+                  {pricing.shippingTier === 'express' ? 'Express Shipping' : 'Standard Shipping'}
+                </span>
                 <span className="font-semibold text-slate-900">
                   {pricing.shippingInCents === 0 ? (
                     <span className="text-emerald-700 font-bold">FREE</span>

@@ -81,8 +81,8 @@ export interface AddItemPayload {
   selectedCapacity?: string;
 }
 
-import type { CartPricingSummary } from '@/lib/pricing/cartPricing';
-export type { CartPricingSummary } from '@/lib/pricing/cartPricing';
+import type { CartPricingSummary, ShippingTier } from '@/lib/pricing/cartPricing';
+export type { CartPricingSummary, ShippingTier } from '@/lib/pricing/cartPricing';
 
 /**
  * Public contract exposed by CartContext and useCart() hook.
@@ -92,6 +92,7 @@ export interface CartContextValue {
   itemCount: number;
   subtotalInCents: number;
   pricing: CartPricingSummary;
+  shippingTier: ShippingTier;
   isDrawerOpen: boolean;
   isHydrated: boolean;
   notification: CartNotification | null;
@@ -103,4 +104,5 @@ export interface CartContextValue {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  setShippingTier: (tier: ShippingTier) => void;
 }
