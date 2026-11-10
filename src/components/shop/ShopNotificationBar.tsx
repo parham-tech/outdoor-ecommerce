@@ -1,7 +1,10 @@
 import React from 'react';
+import { PRICING_CONFIG } from '@/config/pricing';
+
+const DEFAULT_NOTIFICATION_TEXT = `Free shipping on orders of $${PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS / 100} or more \u00A0\u00B7\u00A0 30-day easy returns`;
 
 export function ShopNotificationBar({
-  text = 'Free shipping on orders over $150 \u00A0\u00B7\u00A0 30-day easy returns',
+  text = DEFAULT_NOTIFICATION_TEXT,
 }: {
   text?: string;
 }) {

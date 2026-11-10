@@ -81,6 +81,9 @@ export interface AddItemPayload {
   selectedCapacity?: string;
 }
 
+import type { CartPricingSummary } from '@/lib/pricing/cartPricing';
+export type { CartPricingSummary } from '@/lib/pricing/cartPricing';
+
 /**
  * Public contract exposed by CartContext and useCart() hook.
  */
@@ -88,6 +91,7 @@ export interface CartContextValue {
   items: CartItem[];
   itemCount: number;
   subtotalInCents: number;
+  pricing: CartPricingSummary;
   isDrawerOpen: boolean;
   isHydrated: boolean;
   notification: CartNotification | null;

@@ -17,16 +17,11 @@ import {
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/utils/format';
 
-/**
- * Free standard shipping threshold ($75.00 represented in integer cents).
- */
-const FREE_SHIPPING_THRESHOLD_CENTS = 7500;
-
 export function CartDrawer() {
   const {
     items,
     itemCount,
-    subtotalInCents,
+    pricing,
     isDrawerOpen,
     notification,
     closeDrawer,
@@ -112,13 +107,6 @@ export function CartDrawer() {
     return null;
   }
 
-  const shippingDelta = Math.max(0, FREE_SHIPPING_THRESHOLD_CENTS - subtotalInCents);
-  const shippingProgress = Math.min(
-    100,
-    Math.round((subtotalInCents / FREE_SHIPPING_THRESHOLD_CENTS) * 100)
-  );
-  const qualifiesForFreeShipping = subtotalInCents >= FREE_SHIPPING_THRESHOLD_CENTS;
-
   return (
     <div
       className="fixed inset-0 z-50 flex justify-end"
@@ -200,34 +188,34 @@ export function CartDrawer() {
           <div className="px-5 sm:px-6 py-3 bg-slate-50 border-b border-slate-200 text-xs shrink-0">
             <div className="flex items-center justify-between mb-1.5">
               <span className="font-semibold text-slate-700">
-                {qualifiesForFreeShipping ? (
+                {pricing.qualifiesForFreeShipping ? (
                   <span className="text-emerald-700 font-bold inline-flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
                     You unlocked Free Standard Shipping!
                   </span>
                 ) : (
                   <span>
-                    Add <strong className="text-slate-900">{formatCurrency(shippingDelta)}</strong> more for Free Shipping
+                    Add <strong className="text-slate-900">{formatCurrency(pricing.remainingForFreeShippingInCents)}</strong> more for Free Shipping
                   </span>
                 )}
               </span>
               <span className="text-[11px] font-bold text-slate-500">
-                ${(FREE_SHIPPING_THRESHOLD_CENTS / 100).toFixed(0)} threshold
+                ${(pricing.freeShippingThresholdInCents / 100).toFixed(0)} threshold
               </span>
             </div>
             <div
               className="w-full h-2 bg-slate-200 rounded-full overflow-hidden"
               role="progressbar"
-              aria-valuenow={shippingProgress}
+              aria-valuenow={pricing.freeShippingProgress}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label="Free shipping progress"
             >
               <div
                 className={`h-full transition-all duration-300 ${
-                  qualifiesForFreeShipping ? 'bg-emerald-500' : 'bg-orange-500'
+                  pricing.qualifiesForFreeShipping ? 'bg-emerald-500' : 'bg-orange-500'
                 }`}
-                style={{ width: `${shippingProgress}%` }}
+                style={{ width: `${pricing.freeShippingProgress}%` }}
               />
             </div>
           </div>
@@ -372,17 +360,40 @@ export function CartDrawer() {
         {/* Drawer Footer & Order Summary (only when cart has items) */}
         {items.length > 0 && (
           <div className="p-5 sm:p-6 border-t border-slate-200 bg-slate-50/90 shrink-0 space-y-3">
-            {/* Subtotal Display */}
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-slate-600">Subtotal</span>
-              <span className="text-xl font-extrabold text-slate-900 tracking-tight">
-                {formatCurrency(subtotalInCents)}
-              </span>
-            </div>
+            {/* Complete Order Summary */}
+            <div className="space-y-1.5 text-xs sm:text-sm">
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Subtotal</span>
+                <span className="font-semibold text-slate-900">
+                  {formatCurrency(pricing.subtotalInCents)}
+                </span>
+              </div>
 
-            <p className="text-[11px] text-slate-500 leading-normal">
-              Taxes and shipping calculated at checkout.
-            </p>
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Standard Shipping</span>
+                <span className="font-semibold text-slate-900">
+                  {pricing.shippingInCents === 0 ? (
+                    <span className="text-emerald-700 font-bold">FREE</span>
+                  ) : (
+                    formatCurrency(pricing.shippingInCents)
+                  )}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Estimated Tax (8%)</span>
+                <span className="font-semibold text-slate-900">
+                  {formatCurrency(pricing.taxInCents)}
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                <span className="text-sm sm:text-base font-bold text-slate-900">Estimated Total</span>
+                <span className="text-xl font-extrabold text-slate-900 tracking-tight">
+                  {formatCurrency(pricing.totalInCents)}
+                </span>
+              </div>
+            </div>
 
             {/* Primary Action Button */}
             <button

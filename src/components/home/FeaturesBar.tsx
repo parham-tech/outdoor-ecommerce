@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { PRICING_CONFIG } from '@/config/pricing';
 
 export interface FeatureItem {
   id: string;
@@ -44,7 +45,7 @@ export const DEFAULT_FEATURES: FeatureItem[] = [
   {
     id: 'shipping',
     title: 'Free shipping',
-    description: 'On orders over 150$',
+    description: `On orders of $${PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS / 100} or more`,
     iconSrc: '/images/featured bar svgs/truck.svg',
   },
 ];

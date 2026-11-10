@@ -20,6 +20,7 @@ import type {
 } from '@/types/cart';
 import type { ProductDetail } from '@/types/product';
 import { getProductDetailBySlug } from '@/data/productDetails';
+import { calculateCartPricing } from '@/lib/pricing/cartPricing';
 
 /**
  * Versioned localStorage storage key.
@@ -433,6 +434,11 @@ export function CartProvider({ children }: CartProviderProps) {
     [items]
   );
 
+  const pricing = useMemo(
+    () => calculateCartPricing(subtotalInCents),
+    [subtotalInCents]
+  );
+
   // Cart Actions
   const addItem = useCallback(
     (payload: AddItemPayload): boolean => {
@@ -605,6 +611,7 @@ export function CartProvider({ children }: CartProviderProps) {
       items,
       itemCount,
       subtotalInCents,
+      pricing,
       isDrawerOpen,
       isHydrated,
       notification,
@@ -621,6 +628,7 @@ export function CartProvider({ children }: CartProviderProps) {
       items,
       itemCount,
       subtotalInCents,
+      pricing,
       isDrawerOpen,
       isHydrated,
       notification,

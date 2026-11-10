@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ProductColorOption } from '@/types/product';
 import { formatCurrency } from '@/lib/utils/format';
 import { useCart } from '@/context/CartContext';
+import { PRICING_CONFIG } from '@/config/pricing';
 
 export interface ProductPurchaseFormProps {
   productId: string;
@@ -309,7 +310,7 @@ export function ProductPurchaseForm({
             </svg>
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-900">Free shipping on orders over $150</p>
+            <p className="text-xs font-bold text-slate-900">Free shipping on orders of ${PRICING_CONFIG.FREE_SHIPPING_THRESHOLD_CENTS / 100} or more</p>
             <p className="text-[11px] text-slate-500">Dispatches in 1–2 business days.</p>
           </div>
         </div>
