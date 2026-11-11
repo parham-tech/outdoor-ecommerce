@@ -397,7 +397,16 @@ export function CartDrawer() {
               </div>
             </div>
 
-            {/* Primary Action Button */}
+            {/* Cart Navigation & Checkout Actions */}
+            <Link
+              href="/cart"
+              onClick={closeDrawer}
+              className="w-full flex items-center justify-center gap-2 border-2 border-[#0b121c] text-[#0b121c] hover:bg-[#0b121c] hover:text-white text-sm font-bold py-3 px-6 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b121c] focus-visible:ring-offset-2"
+            >
+              <span>View Cart</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </Link>
+
             <button
               type="button"
               disabled
