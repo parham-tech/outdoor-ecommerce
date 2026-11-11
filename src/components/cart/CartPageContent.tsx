@@ -12,10 +12,60 @@ import {
   ArrowRight,
   CheckCircle2,
   AlertTriangle,
+  AlertCircle,
+  Info,
+  X,
 } from 'lucide-react';
+import type { CartNotification } from '@/types/cart';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/utils/format';
 import { PRICING_CONFIG } from '@/config/pricing';
+
+/**
+ * Dismissible cart notification banner for feedback on quantity adjustments,
+ * stock limit boundaries, or inventory updates.
+ */
+function CartNotificationBanner({
+  notification,
+  onClear,
+}: {
+  notification: CartNotification;
+  onClear: () => void;
+}) {
+  return (
+    <div
+      className={`mb-6 p-4 rounded-xl flex items-start justify-between gap-3 text-xs sm:text-sm border shadow-2xs ${
+        notification.type === 'error'
+          ? 'bg-rose-50 text-rose-800 border-rose-200'
+          : notification.type === 'warning'
+          ? 'bg-amber-50 text-amber-900 border-amber-200'
+          : 'bg-blue-50 text-blue-900 border-blue-200'
+      }`}
+      role="status"
+    >
+      <div className="flex items-start gap-2.5">
+        {notification.type === 'error' && (
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" aria-hidden="true" />
+        )}
+        {notification.type === 'warning' && (
+          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
+        )}
+        {notification.type === 'info' && (
+          <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" aria-hidden="true" />
+        )}
+        <span className="leading-snug">{notification.message}</span>
+      </div>
+      <button
+        type="button"
+        onClick={onClear}
+        className="text-slate-400 hover:text-slate-700 p-1 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500"
+        aria-label="Dismiss notification"
+      >
+        <X className="w-4 h-4" aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
 
 /**
  * Skeleton component rendered while client-side cart hydration is in progress.
@@ -65,7 +115,13 @@ function CartPageSkeleton() {
 /**
  * Empty cart view displayed when hydration is complete and no items exist.
  */
-function EmptyCartView() {
+function EmptyCartView({
+  notification,
+  clearNotification,
+}: {
+  notification?: CartNotification | null;
+  clearNotification?: () => void;
+}) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 w-full">
       {/* Breadcrumb navigation */}
@@ -84,6 +140,16 @@ function EmptyCartView() {
           </li>
         </ol>
       </nav>
+
+      {/* Optional notification banner in empty cart state (e.g. unavailable item removals) */}
+      {notification && clearNotification && (
+        <div className="max-w-xl mx-auto mb-6">
+          <CartNotificationBanner
+            notification={notification}
+            onClear={clearNotification}
+          />
+        </div>
+      )}
 
       <div className="max-w-xl mx-auto text-center bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-12 shadow-xs">
         <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-5">
@@ -115,6 +181,8 @@ export function CartPageContent() {
     pricing,
     shippingTier,
     isHydrated,
+    notification,
+    clearNotification,
     updateQuantity,
     removeItem,
     clearCart,
@@ -130,7 +198,12 @@ export function CartPageContent() {
 
   // 2. Empty Cart State
   if (items.length === 0) {
-    return <EmptyCartView />;
+    return (
+      <EmptyCartView
+        notification={notification}
+        clearNotification={clearNotification}
+      />
+    );
   }
 
   return (
@@ -178,6 +251,14 @@ export function CartPageContent() {
           <span>Continue Shopping</span>
         </Link>
       </div>
+
+      {/* Optional Cart Notification Banner */}
+      {notification && (
+        <CartNotificationBanner
+          notification={notification}
+          onClear={clearNotification}
+        />
+      )}
 
       {/* Two-Column Responsive Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -401,7 +482,7 @@ export function CartPageContent() {
                   )}
                 </span>
                 <span className="text-[11px] font-bold text-slate-500">
-                  ${(pricing.freeShippingThresholdInCents / 100).toFixed(0)} threshold
+                  {formatCurrency(pricing.freeShippingThresholdInCents)} threshold
                 </span>
               </div>
               <div
@@ -460,7 +541,7 @@ export function CartPageContent() {
                         </span>
                         <span className="text-[11px] text-slate-500 block">
                           {pricing.qualifiesForFreeShipping
-                            ? 'Free on orders over $75'
+                            ? `Free on orders over ${formatCurrency(pricing.freeShippingThresholdInCents)}`
                             : `Add ${formatCurrency(pricing.remainingForFreeShippingInCents)} for free shipping`}
                         </span>
                       </div>
@@ -507,8 +588,22 @@ export function CartPageContent() {
                 </div>
               </fieldset>
 
-              {/* Tax */}
+              {/* Active Shipping Line Row */}
               <div className="flex items-center justify-between text-slate-600 pt-2 border-t border-slate-100">
+                <span>
+                  {pricing.shippingTier === 'express' ? 'Express Shipping' : 'Standard Shipping'}
+                </span>
+                <span className="font-semibold text-slate-900">
+                  {pricing.shippingInCents === 0 ? (
+                    <span className="text-emerald-700 font-bold">FREE</span>
+                  ) : (
+                    formatCurrency(pricing.shippingInCents)
+                  )}
+                </span>
+              </div>
+
+              {/* Tax */}
+              <div className="flex items-center justify-between text-slate-600">
                 <span>Estimated Tax (8%)</span>
                 <span className="font-semibold text-slate-900">
                   {formatCurrency(pricing.taxInCents)}
