@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useCustomerAuth } from '@/context/CustomerAuthContext';
 
 export interface HeaderProps {
   /** Optional slot for custom or injected utility actions */
@@ -31,7 +32,12 @@ export function Header({
 }: HeaderProps) {
   const pathname = usePathname();
   const { itemCount, openDrawer, isHydrated } = useCart();
+  const { isAuthenticated, customer } = useCustomerAuth();
   const displayCartCount = isHydrated ? (controlledCartCount ?? itemCount) : 0;
+  const accountHref = isAuthenticated ? '/account' : '/login';
+  const accountTitle = isAuthenticated
+    ? `My Account (${customer?.fullName || 'Customer'})`
+    : 'Sign In';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -232,10 +238,10 @@ export function Header({
 
             {/* Account Icon */}
             <Link
-              href="/login"
+              href={accountHref}
               className="p-1.5 sm:p-2 text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm shrink-0"
-              aria-label="Account"
-              title="Account"
+              aria-label={accountTitle}
+              title={accountTitle}
             >
               <Image
                 src="/images/hero svgs/person.svg"
@@ -446,6 +452,28 @@ export function Header({
 
             {/* Drawer Footer with Quick Utilities */}
             <div className="pt-4 border-t border-white/10 text-xs text-slate-400 space-y-2 shrink-0">
+              <Link
+                href={accountHref}
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px]"
+              >
+                <span className="flex items-center gap-2 font-medium">
+                  <Image
+                    src="/images/hero svgs/person.svg"
+                    alt=""
+                    width={18}
+                    height={18}
+                    className="w-4 h-4 object-contain shrink-0"
+                  />
+                  {isAuthenticated ? 'My Account' : 'Sign In'}
+                </span>
+                {isAuthenticated && (
+                  <span className="text-[11px] text-orange-400 font-semibold truncate max-w-[120px]">
+                    {customer?.fullName}
+                  </span>
+                )}
+              </Link>
+
               <button
                 type="button"
                 onClick={() => {

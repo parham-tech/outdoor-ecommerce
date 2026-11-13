@@ -407,16 +407,14 @@ export function CartDrawer() {
               <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
 
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              className="w-full flex items-center justify-center gap-2 bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white text-sm font-bold py-3.5 px-6 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#A94900]"
-              aria-label="Proceed to checkout (checkout preview unavailable in current prototype)"
+            <Link
+              href="/checkout"
+              onClick={closeDrawer}
+              className="w-full flex items-center justify-center gap-2 bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white text-sm font-bold py-3.5 px-6 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] focus-visible:ring-offset-2"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </button>
+            </Link>
 
             {/* Secondary Actions Row */}
             <div className="flex items-center justify-between pt-1 text-xs">

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useMemo, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Eye,
   EyeOff,
@@ -16,6 +17,8 @@ import {
   Check,
   X,
 } from 'lucide-react';
+import { useCustomerAuth } from '@/context/CustomerAuthContext';
+import { getSafeInternalRedirect } from '@/lib/utils/redirect';
 
 interface FieldErrors {
   firstName?: string;
@@ -32,6 +35,17 @@ interface PasswordCriteria {
 }
 
 export function CustomerRegisterForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { register } = useCustomerAuth();
+
+  const rawRedirect = searchParams.get('redirect');
+  const safeRedirect = getSafeInternalRedirect(rawRedirect, '/account');
+  const loginHref =
+    safeRedirect !== '/account'
+      ? `/login?redirect=${encodeURIComponent(safeRedirect)}`
+      : '/login';
+
   // Form State
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -149,7 +163,7 @@ export function CustomerRegisterForm() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setBannerError(null);
     setBannerSuccess(null);
@@ -160,19 +174,23 @@ export function CustomerRegisterForm() {
 
     setIsLoading(true);
 
-    // Simulated client-side submission (Frontend mock demonstration)
-    setTimeout(() => {
+    try {
+      await register({ firstName, lastName, email, password });
+      setBannerSuccess(
+        `Welcome to ALTITUDE, ${firstName}! Your account has been simulated successfully. Redirecting to your account...`
+      );
+      setTimeout(() => {
+        router.push(safeRedirect);
+      }, 500);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Registration failed. Please check your information and try again.';
+      setBannerError(message);
+      emailInputRef.current?.focus();
       setIsLoading(false);
-
-      if (email.toLowerCase() === 'taken@example.com') {
-        setBannerError('An account with this email address already exists. Please sign in instead.');
-        emailInputRef.current?.focus();
-      } else {
-        setBannerSuccess(
-          `Welcome to ALTITUDE, ${firstName}! Your account has been simulated successfully. You can now sign in to start exploring.`
-        );
-      }
-    }, 900);
+    }
   };
 
   return (
@@ -221,7 +239,7 @@ export function CustomerRegisterForm() {
               <p className="mt-0.5 text-emerald-700 leading-relaxed">{bannerSuccess}</p>
               <div className="mt-3">
                 <Link
-                  href="/login"
+                  href={loginHref}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 underline underline-offset-2"
                 >
                   <span>Proceed to Sign In</span>
@@ -628,7 +646,7 @@ export function CustomerRegisterForm() {
         <div className="mt-6 text-center text-xs sm:text-sm text-stone-600 border-t border-stone-200/80 pt-5">
           <span>Already registered with ALTITUDE? </span>
           <Link
-            href="/login"
+            href={loginHref}
             className="font-semibold text-orange-600 hover:text-orange-700 underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm"
           >
             Sign In here

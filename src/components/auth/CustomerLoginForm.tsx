@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Eye,
   EyeOff,
@@ -13,6 +14,8 @@ import {
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';
+import { useCustomerAuth } from '@/context/CustomerAuthContext';
+import { getSafeInternalRedirect } from '@/lib/utils/redirect';
 
 interface FieldErrors {
   email?: string;
@@ -20,6 +23,17 @@ interface FieldErrors {
 }
 
 export function CustomerLoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useCustomerAuth();
+
+  const rawRedirect = searchParams.get('redirect');
+  const safeRedirect = getSafeInternalRedirect(rawRedirect, '/account');
+  const registerHref =
+    safeRedirect !== '/account'
+      ? `/register?redirect=${encodeURIComponent(safeRedirect)}`
+      : '/register';
+
   // Form Field State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,7 +81,7 @@ export function CustomerLoginForm() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setBannerError(null);
     setBannerSuccess(null);
@@ -78,20 +92,19 @@ export function CustomerLoginForm() {
 
     setIsLoading(true);
 
-    // Simulated client-side submission (Frontend mock demonstration)
-    setTimeout(() => {
+    try {
+      await login(email, password);
+      setBannerSuccess(`Welcome back! Simulated sign-in successful. Redirecting to your account...`);
+      setTimeout(() => {
+        router.push(safeRedirect);
+      }, 500);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Invalid customer credentials. Please try again.';
+      setBannerError(message);
+      passwordInputRef.current?.focus();
       setIsLoading(false);
-
-      // Demonstrate prototype response
-      if (email.toLowerCase() === 'error@example.com') {
-        setBannerError('Invalid customer credentials. Please check your email and password.');
-        passwordInputRef.current?.focus();
-      } else {
-        setBannerSuccess(
-          `Welcome back! Simulated sign-in successful for ${email}. Session cookies and cart reconciliation will be executed when backend is connected.`
-        );
-      }
-    }, 800);
+    }
   };
 
   return (
@@ -321,7 +334,7 @@ export function CustomerLoginForm() {
         <div className="mt-6 text-center text-xs sm:text-sm text-stone-600">
           <span>Don&apos;t have an account yet? </span>
           <Link
-            href="/register"
+            href={registerHref}
             className="font-semibold text-orange-600 hover:text-orange-700 underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm"
           >
             Create an account

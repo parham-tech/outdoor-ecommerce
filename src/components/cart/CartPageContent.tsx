@@ -619,21 +619,15 @@ export function CartPageContent() {
               </div>
             </div>
 
-            {/* Prototype Checkout Action */}
+            {/* Checkout Action */}
             <div className="space-y-2 pt-2">
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                className="w-full flex items-center justify-center gap-2 bg-[#A94900] text-white text-sm font-bold py-3.5 px-6 rounded-lg shadow-xs opacity-50 cursor-not-allowed focus-visible:outline-none"
-                aria-label="Proceed to checkout (checkout preview unavailable in current prototype)"
+              <Link
+                href="/checkout"
+                className="w-full flex items-center justify-center gap-2 bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white text-sm font-bold py-3.5 px-6 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] focus-visible:ring-offset-2"
               >
                 <span>Proceed to Checkout</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </button>
-              <p className="text-[11px] text-slate-500 text-center">
-                Checkout preview unavailable in current prototype.
-              </p>
+              </Link>
             </div>
           </div>
         </section>
