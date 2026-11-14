@@ -27,6 +27,7 @@ const NAV_LINKS = [
 
 export function Header({
   actions,
+  variant,
   activeHref,
   cartCount: controlledCartCount,
 }: HeaderProps) {
@@ -41,6 +42,8 @@ export function Header({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isVisible, setIsVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
@@ -48,10 +51,98 @@ export function Header({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const searchPanelRef = useRef<HTMLDivElement>(null);
+  const lastScrollYRef = useRef(0);
+  const tickingRef = useRef(false);
 
-  // Natural scroll: Header participates in normal document flow with relative positioning
-  // Solid midnight navy background and shadow matching Shop, About, and Contact pages
-  const containerClass = 'relative z-30 w-full bg-[#0b121c] text-white shadow-md';
+  // Solid appearance is default across all routes (including homepage) unless explicitly set to transparent
+  const isTransparentVariant = variant === 'transparent';
+
+  // Adjust visibility state during render if pathname changes (React recommended pattern)
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setIsVisible(true);
+  }
+
+  // Smart Sticky Scroll Management (100% unified across both variants)
+  useEffect(() => {
+    lastScrollYRef.current = Math.max(0, window.scrollY);
+
+    const SCROLL_DELTA_THRESHOLD = 8;
+    const SCROLL_TOP_THRESHOLD = 80;
+
+    const updateScrollDirection = () => {
+      const currentScrollY = Math.max(0, window.scrollY);
+      const prevScrollY = lastScrollYRef.current;
+      const delta = currentScrollY - prevScrollY;
+
+      setIsScrolled(currentScrollY > 20);
+
+      // Keep header visible while mobile drawer or search overlay is open
+      if (isMenuOpen || isSearchOpen) {
+        setIsVisible(true);
+        lastScrollYRef.current = currentScrollY;
+        tickingRef.current = false;
+        return;
+      }
+
+      // Keep header visible when near or at the top of the page
+      if (currentScrollY <= SCROLL_TOP_THRESHOLD) {
+        setIsVisible(true);
+        lastScrollYRef.current = currentScrollY;
+        tickingRef.current = false;
+        return;
+      }
+
+      // Evaluate scroll direction beyond top threshold with hysteresis
+      if (Math.abs(delta) >= SCROLL_DELTA_THRESHOLD) {
+        if (delta > 0) {
+          setIsVisible(false); // Scrolling down: hide
+        } else {
+          setIsVisible(true);  // Scrolling up: reveal
+        }
+        lastScrollYRef.current = currentScrollY;
+      }
+
+      tickingRef.current = false;
+    };
+
+    const handleScroll = () => {
+      if (!tickingRef.current) {
+        window.requestAnimationFrame(updateScrollDirection);
+        tickingRef.current = true;
+      }
+    };
+
+    // Synchronize initial scroll state on mount via requestAnimationFrame
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isMenuOpen, isSearchOpen]);
+
+  // Sync scroll ref upon route change
+  useEffect(() => {
+    lastScrollYRef.current = Math.max(0, window.scrollY);
+  }, [pathname]);
+
+  // Positioning: transparent overlay uses -mb-20 to overlay Hero without pushing layout
+  const positioningClass = isTransparentVariant
+    ? 'sticky top-0 z-40 w-full -mb-20'
+    : 'sticky top-0 z-40 w-full';
+
+  // Visual styling: top-of-page aesthetic vs. elevated scrolled state
+  const visualClass = isScrolled
+    ? 'bg-[#0b121c]/95 backdrop-blur-md shadow-lg border-b border-white/5'
+    : isTransparentVariant
+    ? 'bg-gradient-to-b from-black/60 via-black/20 to-transparent border-b border-white/10'
+    : 'bg-[#0b121c] shadow-md';
+
+  const transformClass = isVisible ? 'translate-y-0' : '-translate-y-full';
+
+  const containerClass = `${positioningClass} ${visualClass} ${transformClass} text-white transition-all duration-300 ease-in-out motion-reduce:transition-none`;
 
   // Close overlays on Escape key
   useEffect(() => {
@@ -118,7 +209,10 @@ export function Header({
   };
 
   return (
-    <header className={containerClass}>
+    <header
+      className={containerClass}
+      onFocusCapture={() => setIsVisible(true)}
+    >
       {/* Main Top Header Bar */}
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between w-full h-20">
