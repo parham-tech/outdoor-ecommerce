@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, use } from 'react';
+import React, { useMemo, useState, use, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -380,7 +380,7 @@ function OrderDetailsContent({ orderId }: { orderId: string }) {
   );
 }
 
-export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
+function OrderDetailsView({ params }: OrderDetailsPageProps) {
   const unwrappedParams = use(params);
   return (
     <AccountAuthGuard>
@@ -388,3 +388,29 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
     </AccountAuthGuard>
   );
 }
+
+function OrderDetailsFallback() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-pulse">
+      <div className="h-6 w-32 bg-stone-200 rounded mb-8" />
+      <div className="bg-white rounded-2xl border border-stone-200 p-8 shadow-xs mb-6">
+        <div className="h-8 bg-stone-200 rounded w-1/3 mb-4" />
+        <div className="h-4 bg-stone-100 rounded w-1/4 mb-6" />
+        <div className="h-24 bg-stone-50 rounded-xl" />
+      </div>
+      <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs">
+        <div className="h-20 bg-stone-100 rounded-xl mb-4" />
+        <div className="h-20 bg-stone-100 rounded-xl" />
+      </div>
+    </div>
+  );
+}
+
+export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
+  return (
+    <Suspense fallback={<OrderDetailsFallback />}>
+      <OrderDetailsView params={params} />
+    </Suspense>
+  );
+}
+
