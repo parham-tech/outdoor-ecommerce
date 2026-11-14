@@ -15,12 +15,12 @@ export function Hero({ ctaHref = '#catalog' }: HeroProps) {
       {/* Responsive Background Images with Native Art Direction */}
       <picture className="absolute inset-0 w-full h-full pointer-events-none select-none">
         {/* Mobile: 320px up to 639px */}
-        <source media="(max-width: 639px)" srcSet="/images/hero-bg-480.png" />
+        <source media="(max-width: 639px)" srcSet="/images/hero-bg-480.jpg" />
         {/* Tablet: 640px up to 1023px */}
-        <source media="(max-width: 1023px)" srcSet="/images/hero-bg-tablet.png" />
+        <source media="(max-width: 1023px)" srcSet="/images/hero-bg-tablet.jpg" />
         {/* Desktop: 1024px and above (Default Fallback) */}
         <img
-          src="/images/hero-bg.png"
+          src="/images/hero-bg.jpg"
           alt="Expedition tent and campfire against an alpine sunrise mountain panorama"
           className="w-full h-full object-cover object-center"
           fetchPriority="high"

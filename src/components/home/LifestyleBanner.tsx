@@ -9,7 +9,7 @@ export function LifestyleBanner() {
     >
       {/* Background Alpine Lake & Mountain Sunrise Image */}
       <Image
-        src="/images/lifestyleBanner.png"
+        src="/images/lifestyleBanner.jpg"
         alt="Alpine lake shoreline with tent and campfire against a mountain sunrise"
         fill
         sizes="100vw"

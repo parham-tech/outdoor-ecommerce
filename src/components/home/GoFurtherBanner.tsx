@@ -15,7 +15,7 @@ export function GoFurtherBanner({ ctaHref = '/products' }: GoFurtherBannerProps)
     >
       {/* Background Alpine Panorama with Lake, Campsite Tent, and Golden Sunset */}
       <Image
-        src="/images/go-further-banner.png"
+        src="/images/go-further-banner.jpg"
         alt="Alpine mountain panorama with lake, campsite tent, and campfire at golden sunset"
         fill
         sizes="100vw"
