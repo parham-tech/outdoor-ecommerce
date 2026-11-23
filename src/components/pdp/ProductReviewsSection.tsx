@@ -183,7 +183,7 @@ export function ProductReviewsSection({
                       style={{ width: `${dist.percentage}%` }}
                     />
                   </div>
-                  <span className="w-6 text-right text-slate-400 font-mono text-[11px]">{dist.count}</span>
+                  <span className="w-6 text-right text-slate-600 font-mono text-[11px]">{dist.count}</span>
                 </div>
               ))}
             </div>
@@ -260,7 +260,7 @@ export function ProductReviewsSection({
                           Sample review
                         </span>
                       </div>
-                      <time className="text-xs text-slate-400 font-normal">{rev.date}</time>
+                      <time className="text-xs text-slate-600 font-normal">{rev.date}</time>
                     </div>
 
                     <div className="flex text-amber-500 text-xs mb-2 tracking-tight" aria-label={`${rev.rating} out of 5 stars`}>

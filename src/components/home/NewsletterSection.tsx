@@ -88,7 +88,7 @@ export function NewsletterSection() {
             <button
               type="submit"
               aria-label="Join the journey newsletter"
-              className="bg-[#FA7109] hover:bg-[#EA580C] active:bg-[#C2410C] text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-full transition-all duration-200 shrink-0 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 select-none cursor-pointer"
+              className="bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-full transition-all duration-200 shrink-0 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 select-none cursor-pointer"
             >
               JOIN THE JOURNEY
             </button>

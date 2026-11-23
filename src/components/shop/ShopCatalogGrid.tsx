@@ -115,7 +115,7 @@ export function ShopCatalogGrid({
       {products.length === 0 ? (
         <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 p-8">
           <p className="text-slate-500 text-sm">No products matched your active filters.</p>
-          <p className="text-xs text-slate-400 mt-1">Try resetting or loosening your filter criteria.</p>
+          <p className="text-xs text-slate-600 mt-1">Try resetting or loosening your filter criteria.</p>
         </div>
       ) : (
         <div
@@ -152,7 +152,7 @@ export function ShopCatalogGrid({
             type="button"
             disabled={currentPage <= 1}
             onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
-            className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:pointer-events-none transition-colors"
             title="Previous page"
             aria-label="Previous page"
           >

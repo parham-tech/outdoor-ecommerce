@@ -91,9 +91,9 @@ export function AccountNav({ title, subtitle }: AccountNavProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`inline-flex items-center gap-2 py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-t-lg ${
+              className={`inline-flex items-center gap-2 py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] rounded-t-lg ${
                 item.isActive
-                  ? 'border-orange-600 text-orange-600 font-bold bg-orange-50/40'
+                  ? 'border-[#A94900] text-[#A94900] font-bold bg-orange-50/40'
                   : 'border-transparent text-stone-600 hover:text-stone-900 hover:border-stone-300'
               }`}
               aria-current={item.isActive ? 'page' : undefined}

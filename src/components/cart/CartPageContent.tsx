@@ -372,13 +372,13 @@ export function CartPageContent() {
                         {/* Text Details */}
                         <div className="min-w-0 flex-1">
                           {item.category && (
-                            <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase block truncate">
+                            <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase block truncate">
                               {item.category}
                             </span>
                           )}
                           <Link
                             href={`/products/${item.slug}`}
-                            className="text-sm sm:text-base font-bold text-slate-900 hover:text-orange-600 transition-colors line-clamp-2 block leading-snug"
+                            className="text-sm sm:text-base font-bold text-slate-900 hover:text-[#A94900] transition-colors line-clamp-2 block leading-snug"
                           >
                             {item.name}
                           </Link>
@@ -459,7 +459,7 @@ export function CartPageContent() {
                             }}
                             type="button"
                             onClick={() => handleRemoveItem(item.id, idx, item.name)}
-                            className="text-slate-400 hover:text-rose-600 p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                            className="text-slate-500 hover:text-rose-600 p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                             aria-label={`Remove ${item.name} from cart`}
                             title="Remove item"
                           >
@@ -479,7 +479,7 @@ export function CartPageContent() {
                           }}
                           type="button"
                           onClick={() => handleRemoveItem(item.id, idx, item.name)}
-                          className="text-slate-400 hover:text-rose-600 p-1.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                          className="text-slate-500 hover:text-rose-600 p-1.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                           aria-label={`Remove ${item.name} from cart`}
                           title="Remove item"
                         >
@@ -604,7 +604,7 @@ export function CartPageContent() {
                   <label
                     className={`flex items-start justify-between p-3 rounded-xl border cursor-pointer transition-all ${
                       shippingTier === 'standard'
-                        ? 'border-orange-500 bg-orange-50/40 ring-1 ring-orange-500'
+                        ? 'border-[#A94900] bg-orange-50/40 ring-1 ring-[#A94900]'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
@@ -641,7 +641,7 @@ export function CartPageContent() {
                   <label
                     className={`flex items-start justify-between p-3 rounded-xl border cursor-pointer transition-all ${
                       shippingTier === 'express'
-                        ? 'border-orange-500 bg-orange-50/40 ring-1 ring-orange-500'
+                        ? 'border-[#A94900] bg-orange-50/40 ring-1 ring-[#A94900]'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >

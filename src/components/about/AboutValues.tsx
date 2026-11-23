@@ -89,7 +89,7 @@ export function AboutValues() {
     >
       {/* Section Header */}
       <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#f97316] mb-2">
+        <p className="text-xs font-bold uppercase tracking-widest text-[#A94900] mb-2">
           OUR PRINCIPLES
         </p>
         <h2

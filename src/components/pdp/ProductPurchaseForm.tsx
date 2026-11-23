@@ -152,7 +152,7 @@ export function ProductPurchaseForm({
           </a>
         </div>
       ) : (
-        <div className="text-xs text-slate-400 mb-3">Sample catalog item · No customer reviews</div>
+        <div className="text-xs text-slate-600 mb-3">Sample catalog item · No customer reviews</div>
       )}
 
       {/* Product Price */}
@@ -298,7 +298,7 @@ export function ProductPurchaseForm({
           onClick={handleAddToCart}
           disabled={!inStock || !isHydrated}
           aria-disabled={!inStock || !isHydrated}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#e86c1e] hover:bg-[#cf5b15] active:bg-[#b54c0e] text-white text-sm font-bold py-3.5 px-6 rounded-lg shadow-sm transition-all duration-150 transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+          className="flex-1 flex items-center justify-center gap-2 bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white text-sm font-bold py-3.5 px-6 rounded-lg shadow-sm transition-all duration-150 transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
         >
           <svg className="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -385,7 +385,7 @@ export function ProductPurchaseForm({
 
       {/* SKU & Transparency Note */}
       {sku && (
-        <p className="text-[10px] text-slate-400">
+        <p className="text-[10px] text-slate-600">
           SKU: {sku} · Sample product content for demonstration
         </p>
       )}

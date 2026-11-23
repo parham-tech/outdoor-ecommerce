@@ -48,7 +48,7 @@ export function CheckoutOrderSummary({ items, pricing }: CheckoutOrderSummaryPro
                 {formatCurrency(item.priceInCents * item.quantity)}
               </p>
               {item.quantity > 1 && (
-                <p className="text-xs text-slate-400">{formatCurrency(item.priceInCents)} each</p>
+                <p className="text-xs text-slate-600">{formatCurrency(item.priceInCents)} each</p>
               )}
             </div>
           </li>

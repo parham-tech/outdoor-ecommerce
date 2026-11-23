@@ -99,13 +99,13 @@ export function ProductCard({
           {/* Product Body Details */}
           <div className="p-4 space-y-2">
             {shopProduct.category && (
-              <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase block">
+              <span className="text-[10px] font-bold tracking-widest text-slate-600 uppercase block">
                 {shopProduct.category}
               </span>
             )}
 
             <Link href={`/products/${product.slug}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm">
-              <h3 className="text-sm font-bold text-slate-900 leading-snug group-hover:text-orange-600 transition-colors">
+              <h3 className="text-sm font-bold text-slate-900 leading-snug group-hover:text-[#A94900] transition-colors">
                 {product.name}
               </h3>
             </Link>
@@ -130,7 +130,7 @@ export function ProductCard({
                     </span>
                   ))}
                 </div>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-slate-600">
                   ({product.reviewCount})
                 </span>
               </div>
@@ -159,7 +159,7 @@ export function ProductCard({
                     />
                   </button>
                 ))}
-                <span className="text-[10px] text-slate-400 ml-1.5 select-none">
+                <span className="text-[10px] text-slate-600 ml-1.5 select-none">
                   {shopProduct.colorCount ?? shopProduct.colorSwatches.length} color{(shopProduct.colorCount ?? shopProduct.colorSwatches.length) > 1 ? 's' : ''}
                 </span>
               </div>
@@ -175,7 +175,7 @@ export function ProductCard({
 
           <Link
             href={`/products/${product.slug}`}
-            className="inline-flex items-center gap-1 bg-[#f97316] hover:bg-orange-600 active:bg-orange-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 group/btn"
+            className="inline-flex items-center gap-1 bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 group/btn"
           >
             <span>View gear</span>
             <span className="group-hover/btn:translate-x-0.5 transition-transform" aria-hidden="true">→</span>
@@ -208,7 +208,7 @@ export function ProductCard({
       <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between bg-white border-t border-neutral-100">
         <div>
           {/* Product Title */}
-          <h3 className="text-sm font-semibold text-[#1C3323] truncate group-hover:text-[#FA7109] transition-colors leading-snug">
+          <h3 className="text-sm font-semibold text-[#1C3323] truncate group-hover:text-[#A94900] transition-colors leading-snug">
             {product.name}
           </h3>
 
@@ -233,12 +233,12 @@ export function ProductCard({
                     </svg>
                   ))}
                 </div>
-                <span className="text-xs text-[#2E4D36]/70">
+                <span className="text-xs text-slate-600">
                   ({product.reviewCount})
                 </span>
               </div>
             ) : (
-              <span className="text-xs text-[#2E4D36]/60">
+              <span className="text-xs text-slate-600">
                 No customer reviews
               </span>
             )}

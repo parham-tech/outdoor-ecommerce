@@ -274,7 +274,7 @@ export function OrderSuccessContent() {
                     </p>
                   )}
                   {item.sku && (
-                    <p className="text-[11px] text-slate-400 font-mono mt-0.5">SKU: {item.sku}</p>
+                    <p className="text-[11px] text-slate-600 font-mono mt-0.5">SKU: {item.sku}</p>
                   )}
                   <p className="text-xs text-slate-500 mt-1">Quantity: {item.quantity}</p>
                 </div>
@@ -284,7 +284,7 @@ export function OrderSuccessContent() {
                     {formatCurrency(item.priceInCents * item.quantity)}
                   </p>
                   {item.quantity > 1 && (
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-600">
                       {formatCurrency(item.priceInCents)} each
                     </p>
                   )}

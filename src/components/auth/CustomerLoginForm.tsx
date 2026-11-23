@@ -244,7 +244,7 @@ export function CustomerLoginForm() {
               </label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-medium text-orange-600 hover:text-orange-700 underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm"
+                className="text-xs font-medium text-[#A94900] hover:text-[#8F3E00] underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] rounded-sm"
               >
                 Forgot password?
               </Link>

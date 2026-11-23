@@ -59,7 +59,7 @@ export function GoFurtherBanner({ ctaHref = '/products' }: GoFurtherBannerProps)
           {/* Call to Action Button */}
           <Link
             href={ctaHref}
-            className="group inline-flex items-center gap-2 bg-[#FA7109] text-white hover:bg-[#EA580C] active:bg-[#C2410C] font-bold text-xs sm:text-sm uppercase tracking-wider px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black/50"
+            className="group inline-flex items-center gap-2 bg-[#A94900] text-white hover:bg-[#8F3E00] active:bg-[#753300] font-bold text-xs sm:text-sm uppercase tracking-wider px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black/50"
             aria-label="Shop all gear - View products catalog"
           >
             <span>SHOP ALL GEAR</span>

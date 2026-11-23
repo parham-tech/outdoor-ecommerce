@@ -174,7 +174,7 @@ function OrderHistoryContent() {
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-xl transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            className="inline-flex items-center gap-2 bg-[#A94900] hover:bg-[#8F3E00] active:bg-[#753300] text-white text-xs sm:text-sm font-bold py-3 px-6 rounded-xl transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900]"
           >
             <ShoppingBag className="w-4 h-4" aria-hidden="true" />
             <span>Explore Backcountry Catalog</span>

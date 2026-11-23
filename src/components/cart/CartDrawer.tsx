@@ -327,14 +327,14 @@ export function CartDrawer() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         {item.category && (
-                          <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase block truncate">
+                          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase block truncate">
                             {item.category}
                           </span>
                         )}
                         <Link
                           href={`/products/${item.slug}`}
                           onClick={closeDrawer}
-                          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-orange-600 transition-colors line-clamp-1 block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
+                          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-[#A94900] transition-colors line-clamp-1 block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
                         >
                           {item.name}
                         </Link>
@@ -347,7 +347,7 @@ export function CartDrawer() {
                         }}
                         type="button"
                         onClick={() => handleRemoveItem(item.id, idx, item.name)}
-                        className="text-slate-400 hover:text-rose-600 p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 shrink-0"
+                        className="text-slate-500 hover:text-rose-600 p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 shrink-0"
                         aria-label={`Remove ${item.name} from cart`}
                         title="Remove item"
                       >

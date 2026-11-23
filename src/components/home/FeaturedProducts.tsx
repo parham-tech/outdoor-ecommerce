@@ -31,7 +31,7 @@ export function FeaturedProducts({
 
           <Link
             href={viewAllHref}
-            className="group inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-[#1C3323] hover:text-[#FA7109] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E4D36] focus-visible:ring-offset-2 rounded-sm"
+            className="group inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-[#1C3323] hover:text-[#A94900] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E4D36] focus-visible:ring-offset-2 rounded-sm"
             aria-label="View all products"
           >
             <span>View All Products</span>

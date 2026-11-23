@@ -11,7 +11,7 @@ export function AboutStory() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
         {/* Left Column: Narrative Copy */}
         <div className="lg:col-span-6 flex flex-col justify-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#f97316] mb-2 sm:mb-2.5">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#A94900] mb-2 sm:mb-2.5">
             OUR STORY
           </p>
 
@@ -31,7 +31,7 @@ export function AboutStory() {
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-200/80 flex items-center gap-2 text-[11px] sm:text-xs text-slate-400">
+          <div className="mt-6 pt-4 border-t border-slate-200/80 flex items-center gap-2 text-[11px] sm:text-xs text-slate-600">
             <span className="w-1.5 h-1.5 rounded-full bg-orange-500 inline-block" aria-hidden="true" />
             <span>Demonstration concept for the ALTITUDE outdoor e-commerce storefront</span>
           </div>

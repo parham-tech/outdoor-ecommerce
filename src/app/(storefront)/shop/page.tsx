@@ -154,7 +154,7 @@ export default function ShopPage() {
             </svg>
             <span>{isMobileFilterOpen ? 'Hide Filters' : 'Show Filters'}</span>
             {activeFilterCount > 0 && (
-              <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+              <span className="bg-[#A94900] text-white text-xs px-2 py-0.5 rounded-full font-bold">
                 {activeFilterCount}
               </span>
             )}
@@ -164,7 +164,7 @@ export default function ShopPage() {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700"
+              className="text-xs font-semibold text-[#A94900] hover:text-[#8F3E00]"
             >
               Reset
             </button>
