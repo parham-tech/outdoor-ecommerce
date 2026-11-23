@@ -2,43 +2,64 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const SHOP_LINKS = [
+interface FooterLinkItem {
+  label: string;
+  href?: string;
+}
+
+const SHOP_LINKS: readonly FooterLinkItem[] = [
   { label: 'Tents & Shelters', href: '/shop' },
-  { label: 'Backpacks', href: '/shop' },
+  { label: 'backpacks', href: '/shop' },
   { label: 'Camping Kitchen', href: '/shop' },
-  { label: 'Lighting', href: '/shop' },
+  { label: 'Lightning', href: '/shop' },
 ] as const;
 
-
-const ABOUT_LINKS = [
+const ABOUT_LINKS: readonly FooterLinkItem[] = [
   { label: 'Our Story', href: '/about' },
   { label: 'Sustainablity', href: '/#go-further-banner-heading' },
   { label: 'Blog', href: '/#featured-products-heading' },
   { label: 'Contact', href: '/contact' },
 ] as const;
 
-const SUPPORT_LINKS = [
-  { label: 'Shipping', href: '/#main-content' },
-  { label: 'Return', href: '/#main-content' },
-  { label: 'FAQ', href: '/#main-content' },
+const SUPPORT_LINKS: readonly FooterLinkItem[] = [
+  { label: 'Shipping' },
+  { label: 'Return' },
+  { label: 'FAQ' },
   { label: 'Customer Service', href: '/#newsletter-heading' },
 ] as const;
+interface SocialLinkItem {
+  name: string;
+  href: string;
+  iconSrc: string;
+  width: number;
+  height: number;
+  className: string;
+}
 
-const SOCIAL_LINKS = [
+const SOCIAL_LINKS: readonly SocialLinkItem[] = [
   {
     name: 'Instagram',
     href: 'https://instagram.com',
     iconSrc: '/images/footer/instagram.png',
+    width: 28,
+    height: 28,
+    className: 'w-7 h-7',
   },
   {
     name: 'Telegram',
     href: 'https://t.me',
     iconSrc: '/images/footer/telegram.png',
+    width: 22,
+    height: 22,
+    className: 'w-[22px] h-[22px]',
   },
   {
     name: 'Facebook',
     href: 'https://facebook.com',
     iconSrc: '/images/footer/facebook.png',
+    width: 22,
+    height: 22,
+    className: 'w-[22px] h-[22px]',
   },
 ] as const;
 
@@ -53,10 +74,10 @@ export function Footer() {
       </h2>
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-12 sm:pt-14 pb-8">
-        {/* Main 5-Column Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 pb-10 sm:pb-12">
-          {/* Column 1: Brand & Logo */}
-          <div className="sm:col-span-2 md:col-span-1 lg:col-span-1 flex flex-col items-start">
+        {/* Main Grid: Responsive 2-col (Mobile), 4-col (Tablet), 5-col (Desktop) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-y-8 md:gap-y-10 lg:gap-y-0 gap-x-6 sm:gap-x-8 lg:gap-x-12 pb-10 sm:pb-12">
+          {/* Brand & Logo: Full width top row on Mobile (col-span-2) & Tablet (col-span-4), Col 1 on Desktop */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-1 flex flex-col items-start mb-2 md:mb-4 lg:mb-0">
             <Link
               href="/"
               className="inline-flex items-center gap-3.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#011323] rounded-sm"
@@ -75,66 +96,84 @@ export function Footer() {
             </Link>
           </div>
 
-          {/* Column 2: Shop */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 font-sans">
+          {/* Shop Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 font-sans">
               Shop
             </h3>
             <ul className="space-y-2 sm:space-y-2.5">
               {SHOP_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.href ? (
+                    <Link
+                      href={link.href}
+                      className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <span className="text-xs sm:text-sm text-slate-300 cursor-default select-none">
+                      {link.label}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: About */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 font-sans">
+          {/* About Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 font-sans">
               About
             </h3>
             <ul className="space-y-2 sm:space-y-2.5">
               {ABOUT_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.href ? (
+                    <Link
+                      href={link.href}
+                      className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <span className="text-xs sm:text-sm text-slate-300 cursor-default select-none">
+                      {link.label}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 4: Support */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 font-sans">
+          {/* Support Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 font-sans">
               Support
             </h3>
             <ul className="space-y-2 sm:space-y-2.5">
               {SUPPORT_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.href ? (
+                    <Link
+                      href={link.href}
+                      className="text-xs sm:text-sm text-slate-300 hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <span className="text-xs sm:text-sm text-slate-300 cursor-default select-none">
+                      {link.label}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 5: Follow Us */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 font-sans">
+          {/* Follow Us Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 font-sans">
               Follow Us
             </h3>
             <div className="flex items-center gap-3">
@@ -150,9 +189,9 @@ export function Footer() {
                   <Image
                     src={social.iconSrc}
                     alt=""
-                    width={22}
-                    height={22}
-                    className="w-5 h-5 brightness-0 invert object-contain"
+                    width={social.width}
+                    height={social.height}
+                    className={`${social.className} brightness-0 invert object-contain`}
                   />
                 </a>
               ))}
@@ -163,26 +202,18 @@ export function Footer() {
         {/* Horizontal Divider */}
         <div className="w-full border-t border-white/10" />
 
-        {/* Sub-Footer / Copyright & Legal */}
-        <div className="pt-6 sm:pt-7 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© 2026 ALTITUDE. All rights reserved.</p>
+        {/* Sub-Footer / Copyright & Legal: Flex stack on Mobile/Tablet, Space-between on Desktop */}
+        <div className="pt-6 sm:pt-7 flex flex-col space-y-3 text-left lg:space-y-0 lg:flex-row lg:justify-between lg:items-center text-xs text-slate-400">
+          {/* Copyright: Left on Desktop, Line 2 on Mobile/Tablet */}
+          <p className="order-2 lg:order-1 select-none">
+            © 2026 ALTITUDE. All rights reserved.
+          </p>
 
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-6 gap-y-2">
-            <Link
-              href="/#main-content"
-              className="hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
-            >
-              Privacy policy
-            </Link>
-            <Link
-              href="/#main-content"
-              className="hover:text-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
-            >
-              Terms of service
-            </Link>
-            <span className="text-slate-400 select-none">
-              United States · USD $
-            </span>
+          {/* Legal Links & Currency: Right on Desktop, Line 1 on Mobile/Tablet */}
+          <div className="order-1 lg:order-2 flex flex-wrap items-center gap-x-6 gap-y-2 lg:justify-end">
+            <span className="cursor-default select-none">Privacy policy</span>
+            <span className="cursor-default select-none">Terms of service</span>
+            <span className="select-none">United States - USD $</span>
           </div>
         </div>
       </div>

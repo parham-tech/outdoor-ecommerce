@@ -79,7 +79,11 @@ export function FeaturesBar({ icons = {}, features = DEFAULT_FEATURES }: Feature
                       alt=""
                       width={38}
                       height={38}
-                      className=" h-7 sm:h-9 w-auto object-contain select-none pointer-events-none"
+                      className={
+                        item.id === 'shipping'
+                          ? 'max-h-7 sm:max-h-9 max-w-[32px] sm:max-w-[40px] w-auto h-auto object-contain select-none pointer-events-none'
+                          : ' h-7 sm:h-9 w-auto object-contain select-none pointer-events-none'
+                      }
                     />
                   ) : null
                 )}

@@ -65,9 +65,13 @@ export function ShopTrustBar({ items = DEFAULT_TRUST_ITEMS }: { items?: TrustIte
                   <Image
                     src={item.iconSrc}
                     alt=""
-                    width={28}
-                    height={28}
-                    className="w-6 h-6 object-contain select-none pointer-events-none"
+                    width={item.id === 'shipping' ? 28 : 28}
+                    height={item.id === 'shipping' ? 20 : 28}
+                    className={
+                      item.id === 'shipping'
+                        ? 'w-7 h-[20px] object-contain select-none pointer-events-none'
+                        : 'w-6 h-6 object-contain select-none pointer-events-none'
+                    }
                   />
                 </div>
                 <div>
