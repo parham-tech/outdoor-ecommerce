@@ -17,6 +17,48 @@ export function ShopCategoryPills({
   selectedCategory,
   onSelectCategory,
 }: ShopCategoryPillsProps) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const handleContainerFocus = (e: React.FocusEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (!target || target.tagName !== 'BUTTON') return;
+
+    // 1. Only proceed if focus was initiated via keyboard navigation (:focus-visible)
+    if (typeof target.matches === 'function' && !target.matches(':focus-visible')) {
+      return;
+    }
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const buffer = 12; // 4px focus ring + 8px visual breathing room (matches gap-3)
+
+    // Left boundary: only scroll if button is clipped/hidden on the left and container can scroll left
+    if (targetRect.left - buffer < containerRect.left) {
+      if (container.scrollLeft > 0) {
+        const deficit = containerRect.left - (targetRect.left - buffer);
+        const scrollAmount = Math.min(deficit, container.scrollLeft);
+        if (scrollAmount > 0) {
+          container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+      }
+    }
+    // Right boundary: only scroll if button is clipped/hidden on the right and container can scroll right
+    else if (targetRect.right + buffer > containerRect.right) {
+      const maxScrollLeft = container.scrollWidth - container.clientWidth;
+      const remainingScroll = maxScrollLeft - container.scrollLeft;
+      if (remainingScroll > 0) {
+        const deficit = targetRect.right + buffer - containerRect.right;
+        const scrollAmount = Math.min(deficit, remainingScroll);
+        if (scrollAmount > 0) {
+          container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
   const categories: CategoryPillItem[] = [
     {
       id: 'all',
@@ -81,7 +123,11 @@ export function ShopCategoryPills({
       className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 w-full"
       data-purpose="quick-category-pills"
     >
-      <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 scroll-smooth">
+      <div
+        ref={containerRef}
+        onFocus={handleContainerFocus}
+        className="flex items-center gap-3 overflow-x-auto no-scrollbar -mx-1 pl-1 pr-3 py-1.5 scroll-px-3 scroll-smooth"
+      >
         {categories.map((cat) => {
           const isActive =
             selectedCategory === cat.name ||
@@ -93,7 +139,7 @@ export function ShopCategoryPills({
               key={cat.id}
               type="button"
               onClick={() => onSelectCategory(cat.name === 'All gear' ? '' : cat.name)}
-              className={`inline-flex items-center gap-2.5 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
+              className={`inline-flex items-center gap-2.5 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all scroll-mx-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] focus-visible:ring-offset-2 ${
                 isActive
                   ? 'bg-[#0b121c] text-white shadow-sm hover:bg-slate-800'
                   : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
