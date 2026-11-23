@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
+
+const emptySubscribe = () => () => {};
 
 export interface HeaderProps {
   /** Optional slot for custom or injected utility actions */
@@ -44,6 +47,11 @@ export function Header({
   const [searchQuery, setSearchQuery] = useState('');
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
@@ -517,134 +525,137 @@ export function Header({
         </div>
       )}
 
-      {/* Mobile Navigation Drawer Overlay (Does NOT participate in Header flex layout) */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 z-50 md:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation Menu"
-        >
-          {/* Dark Backdrop Scrim */}
+      {/* Mobile Navigation Drawer Overlay (Rendered via Portal to document.body to avoid transform containing block) */}
+      {isMounted &&
+        isMenuOpen &&
+        createPortal(
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
-            onClick={handleCloseMenu}
-            aria-hidden="true"
-          />
-
-          {/* Drawer Panel on Right */}
-          <div
-            ref={drawerRef}
-            id="mobile-navigation"
-            className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-xs sm:max-w-sm h-full max-h-[100vh] max-h-[100dvh] bg-[#0b121c] border-l border-white/10 shadow-2xl flex flex-col justify-between overflow-y-auto p-5 sm:p-6 transition-transform duration-200 ease-out animate-in slide-in-from-right"
+            className="fixed inset-0 z-50 md:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation Menu"
           >
-            {/* Drawer Top Row: Logo & Close Button */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/images/altitude-logo.png"
-                  alt=""
-                  width={28}
-                  height={32}
-                  className="h-7 w-auto object-contain"
-                />
-                <span className="text-lg font-black tracking-wider text-white uppercase">
-                  ALTITUDE
-                </span>
-              </div>
-              <button
-                ref={drawerCloseButtonRef}
-                type="button"
-                onClick={handleCloseMenu}
-                className="p-2 text-slate-400 hover:text-white rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-                aria-label="Close navigation menu"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            {/* Dark Backdrop Scrim */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
+              onClick={handleCloseMenu}
+              aria-hidden="true"
+            />
 
-            {/* Primary Navigation Links with Comfortable 48px Touch Targets */}
-            <nav aria-label="Mobile Navigation Links" className="flex-1 py-5 space-y-1.5 overflow-y-auto">
-              {NAV_LINKS.map((link) => {
-                const isActive =
-                  activeHref !== undefined
-                    ? activeHref === link.href
-                    : link.href === '/'
-                    ? pathname === '/'
-                    : pathname === link.href || (link.href === '/shop' && pathname.startsWith('/products'));
-                return (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center justify-between py-3 px-4 rounded-xl text-base font-semibold transition-colors min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
-                      isActive
-                        ? 'text-[#f97316] bg-white/5 font-bold border-l-2 border-[#f97316]'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <span>{link.label}</span>
-                    <span className="text-slate-500 text-sm" aria-hidden="true">
-                      →
-                    </span>
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Drawer Footer with Quick Utilities */}
-            <div className="pt-4 border-t border-white/10 text-xs text-slate-400 space-y-2 shrink-0">
-              <Link
-                href={accountHref}
-                onClick={() => setIsMenuOpen(false)}
-                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-              >
-                <span className="flex items-center gap-2 font-medium">
+            {/* Drawer Panel on Right */}
+            <div
+              ref={drawerRef}
+              id="mobile-navigation"
+              className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-xs sm:max-w-sm h-full max-h-[100vh] max-h-[100dvh] bg-[#0b121c] border-l border-white/10 shadow-2xl flex flex-col justify-between overflow-y-auto p-5 sm:p-6 transition-transform duration-200 ease-out animate-in slide-in-from-right"
+            >
+              {/* Drawer Top Row: Logo & Close Button */}
+              <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
+                <div className="flex items-center gap-2">
                   <Image
-                    src="/images/hero svgs/person.svg"
+                    src="/images/altitude-logo.png"
                     alt=""
-                    width={18}
-                    height={18}
-                    className="w-4 h-4 object-contain shrink-0"
+                    width={28}
+                    height={32}
+                    className="h-7 w-auto object-contain"
                   />
-                  {isAuthenticated ? 'My Account' : 'Sign In'}
-                </span>
-                {isAuthenticated && (
-                  <span className="text-[11px] text-orange-400 font-semibold truncate max-w-[120px]">
-                    {customer?.fullName}
+                  <span className="text-lg font-black tracking-wider text-white uppercase">
+                    ALTITUDE
                   </span>
-                )}
-              </Link>
+                </div>
+                <button
+                  ref={drawerCloseButtonRef}
+                  type="button"
+                  onClick={handleCloseMenu}
+                  className="p-2 text-slate-400 hover:text-white rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                  aria-label="Close navigation menu"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  openDrawer();
-                }}
-                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-                aria-label={`Open shopping cart with ${displayCartCount} items`}
-              >
-                <span className="flex items-center gap-2 font-medium">
-                  <Image
-                    src="/images/hero svgs/cart.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                    className="w-4 h-4 object-contain shrink-0"
-                  />
-                  Shopping Cart
-                </span>
-                <span className="font-bold text-white bg-orange-600 px-2 py-0.5 rounded-full text-[11px]">
-                  {displayCartCount} {displayCartCount === 1 ? 'item' : 'items'}
-                </span>
-              </button>
+              {/* Primary Navigation Links with Comfortable 48px Touch Targets */}
+              <nav aria-label="Mobile Navigation Links" className="flex-1 py-5 space-y-1.5 overflow-y-auto">
+                {NAV_LINKS.map((link) => {
+                  const isActive =
+                    activeHref !== undefined
+                      ? activeHref === link.href
+                      : link.href === '/'
+                      ? pathname === '/'
+                      : pathname === link.href || (link.href === '/shop' && pathname.startsWith('/products'));
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center justify-between py-3 px-4 rounded-xl text-base font-semibold transition-colors min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
+                        isActive
+                          ? 'text-[#f97316] bg-white/5 font-bold border-l-2 border-[#f97316]'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      <span className="text-slate-500 text-sm" aria-hidden="true">
+                        →
+                      </span>
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Drawer Footer with Quick Utilities */}
+              <div className="pt-4 border-t border-white/10 text-xs text-slate-400 space-y-2 shrink-0">
+                <Link
+                  href={accountHref}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                >
+                  <span className="flex items-center gap-2 font-medium">
+                    <Image
+                      src="/images/hero svgs/person.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                      className="w-4 h-4 object-contain shrink-0"
+                    />
+                    {isAuthenticated ? 'My Account' : 'Sign In'}
+                  </span>
+                  {isAuthenticated && (
+                    <span className="text-[11px] text-orange-400 font-semibold truncate max-w-[120px]">
+                      {customer?.fullName}
+                    </span>
+                  )}
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    openDrawer();
+                  }}
+                  className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                  aria-label={`Open shopping cart with ${displayCartCount} items`}
+                >
+                  <span className="flex items-center gap-2 font-medium">
+                    <Image
+                      src="/images/hero svgs/cart.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                      className="w-4 h-4 object-contain shrink-0"
+                    />
+                    Shopping Cart
+                  </span>
+                  <span className="font-bold text-white bg-orange-600 px-2 py-0.5 rounded-full text-[11px]">
+                    {displayCartCount} {displayCartCount === 1 ? 'item' : 'items'}
+                  </span>
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </header>
   );
 }
