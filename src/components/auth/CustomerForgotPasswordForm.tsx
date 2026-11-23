@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, type FormEvent } from 'react';
+import React, { useState, useRef, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
 import {
   Mail,
@@ -23,8 +23,40 @@ export function CustomerForgotPasswordForm() {
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [bannerError, setBannerError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [validationCount, setValidationCount] = useState(0);
+  const pendingErrorFocusRef = useRef<boolean>(false);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
+  const wasSuccessRef = useRef<boolean>(false);
+  const submitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Focus the invalid email field only after React commits DOM error attributes
+  useEffect(() => {
+    if (validationCount > 0 && pendingErrorFocusRef.current) {
+      pendingErrorFocusRef.current = false;
+      emailInputRef.current?.focus();
+    }
+  }, [validationCount]);
+
+  // Focus the confirmation heading strictly upon state transition to success
+  useEffect(() => {
+    if (isSuccess && !wasSuccessRef.current) {
+      wasSuccessRef.current = true;
+      successHeadingRef.current?.focus();
+    } else if (!isSuccess) {
+      wasSuccessRef.current = false;
+    }
+  }, [isSuccess]);
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
 
   const validateForm = (): boolean => {
     const errors: FieldErrors = {};
@@ -42,10 +74,13 @@ export function CustomerForgotPasswordForm() {
     setFieldErrors(errors);
 
     if (errors.email) {
-      emailInputRef.current?.focus();
+      pendingErrorFocusRef.current = true;
+      setValidationCount((c) => c + 1);
+      return false;
     }
 
-    return Object.keys(errors).length === 0;
+    pendingErrorFocusRef.current = false;
+    return true;
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -58,8 +93,9 @@ export function CustomerForgotPasswordForm() {
 
     setIsLoading(true);
 
+    if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
     // Simulated client-side submission (Frontend mock demonstration)
-    setTimeout(() => {
+    submitTimerRef.current = setTimeout(() => {
       setIsLoading(false);
 
       if (email.toLowerCase() === 'unregistered@example.com') {
@@ -78,7 +114,8 @@ export function CustomerForgotPasswordForm() {
     setEmail('');
     setFieldErrors({});
     setBannerError(null);
-    setTimeout(() => {
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => {
       emailInputRef.current?.focus();
     }, 50);
   };
@@ -122,7 +159,13 @@ export function CustomerForgotPasswordForm() {
             <div className="p-4 sm:p-5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex items-start gap-3">
               <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
               <div className="text-sm space-y-2">
-                <p className="font-bold text-emerald-950 text-base">Password Reset Instructions Sent</p>
+                <h2
+                  ref={successHeadingRef}
+                  tabIndex={-1}
+                  className="font-bold text-emerald-950 text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 rounded-sm"
+                >
+                  Password Reset Instructions Sent
+                </h2>
                 <p className="text-emerald-800 leading-relaxed">
                   We have simulated dispatching password reset instructions to{' '}
                   <strong className="text-emerald-950 font-semibold">{submittedEmail}</strong>.

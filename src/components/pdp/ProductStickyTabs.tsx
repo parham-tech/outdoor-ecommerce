@@ -51,6 +51,7 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#description"
             onClick={(e) => handleTabClick(e, 'description')}
+            aria-current={activeTab === 'description' ? 'true' : undefined}
             className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'description'
                 ? 'text-[#c2410c] border-[#c2410c] font-bold'
@@ -63,6 +64,7 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#features"
             onClick={(e) => handleTabClick(e, 'features')}
+            aria-current={activeTab === 'features' ? 'true' : undefined}
             className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'features'
                 ? 'text-[#c2410c] border-[#c2410c] font-bold'
@@ -75,6 +77,7 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#specifications"
             onClick={(e) => handleTabClick(e, 'specifications')}
+            aria-current={activeTab === 'specifications' ? 'true' : undefined}
             className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'specifications'
                 ? 'text-[#c2410c] border-[#c2410c] font-bold'
@@ -87,6 +90,7 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#reviews"
             onClick={(e) => handleTabClick(e, 'reviews')}
+            aria-current={activeTab === 'reviews' ? 'true' : undefined}
             className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'reviews'
                 ? 'text-[#c2410c] border-[#c2410c] font-bold'

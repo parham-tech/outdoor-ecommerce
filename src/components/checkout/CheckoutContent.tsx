@@ -76,6 +76,30 @@ interface FormErrors {
   country?: string;
 }
 
+const CHECKOUT_FIELD_ORDER: (keyof FormErrors)[] = [
+  'fullName',
+  'email',
+  'phone',
+  'shipFullName',
+  'streetAddress',
+  'city',
+  'state',
+  'postalCode',
+  'country',
+];
+
+const CHECKOUT_ERROR_KEY_TO_DOM_ID: Record<keyof FormErrors, string> = {
+  fullName: 'fullName',
+  email: 'email',
+  phone: 'phone',
+  shipFullName: 'shipFullName',
+  streetAddress: 'streetAddress',
+  city: 'city',
+  state: 'state',
+  postalCode: 'postalCode',
+  country: 'country',
+};
+
 function validateForm(
   customer: CustomerContact,
   address: ShippingAddress
@@ -133,10 +157,22 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
   }));
 
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
+  const [validationCount, setValidationCount] = useState(0);
+  const pendingErrorFocusRef = useRef<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
   const errorBannerRef = useRef<HTMLDivElement>(null);
+
+  // Focus the first invalid field only after React commits DOM error attributes
+  useEffect(() => {
+    if (validationCount > 0 && pendingErrorFocusRef.current) {
+      const targetId = pendingErrorFocusRef.current;
+      pendingErrorFocusRef.current = null;
+      const el = document.getElementById(targetId);
+      el?.focus();
+    }
+  }, [validationCount]);
 
   // Empty cart redirect — deterministic once hydrated
   useEffect(() => {
@@ -175,11 +211,12 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
       // Validate form
       const errors = validateForm(customer, address);
       if (Object.keys(errors).length > 0) {
+        const firstKey = CHECKOUT_FIELD_ORDER.find((k) => errors[k]);
+        if (firstKey) {
+          pendingErrorFocusRef.current = CHECKOUT_ERROR_KEY_TO_DOM_ID[firstKey];
+        }
         setFieldErrors(errors);
-        // Focus first error field
-        const firstKey = Object.keys(errors)[0];
-        const el = document.getElementById(firstKey === 'shipFullName' ? 'shipFullName' : firstKey);
-        el?.focus();
+        setValidationCount((c) => c + 1);
         return;
       }
 

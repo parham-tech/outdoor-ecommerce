@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -26,7 +26,23 @@ function OrderHistoryContent() {
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [cancellationAnnouncement, setCancellationAnnouncement] = useState<string>('');
+  const announcementTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  useEffect(() => {
+    return () => {
+      if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
+    };
+  }, []);
+
+  const announceCancellation = (message: string) => {
+    if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
+    setCancellationAnnouncement('');
+    announcementTimerRef.current = setTimeout(() => {
+      setCancellationAnnouncement(message);
+    }, 50);
+  };
 
   const allOrders: Order[] = useMemo(() => {
     if (!customer?.email) return [];
@@ -50,7 +66,9 @@ function OrderHistoryContent() {
 
     try {
       cancelOrder(orderId, customer.email);
-      setActionSuccess(`Simulated order cancelled successfully.`);
+      const successMsg = 'Simulated order cancelled successfully.';
+      setActionSuccess(successMsg);
+      announceCancellation(successMsg);
       setCancelTargetId(null);
       setRefreshTrigger((prev) => prev + 1);
     } catch (err: unknown) {
@@ -62,6 +80,11 @@ function OrderHistoryContent() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <AccountNav title="Order History" subtitle="View and manage all orders placed with your account." />
+
+      {/* Single Persistent Polite Live Region for Cancellation Status Announcements (WCAG 4.1.3) */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {cancellationAnnouncement}
+      </div>
 
       {/* Action Notification Banners */}
       {actionSuccess && (
@@ -116,14 +139,15 @@ function OrderHistoryContent() {
                 key={tab}
                 type="button"
                 onClick={() => setFilter(tab)}
+                aria-pressed={filter === tab}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   filter === tab
-                    ? 'bg-orange-600 text-white shadow-2xs font-bold'
+                    ? 'bg-[#A94900] text-white shadow-2xs font-bold'
                     : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
                 }`}
               >
                 <span>{tab === 'ALL' ? 'All Orders' : tab.charAt(0) + tab.slice(1).toLowerCase()}</span>{' '}
-                <span className={filter === tab ? 'text-white/80' : 'text-stone-400'}>({count})</span>
+                <span className={filter === tab ? 'text-white/90' : 'text-stone-400'}>({count})</span>
               </button>
             );
           })}

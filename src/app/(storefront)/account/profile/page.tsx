@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, type FormEvent } from 'react';
+import React, { useState, useCallback, useRef, useEffect, type FormEvent } from 'react';
 import {
   User,
   Mail,
@@ -38,6 +38,17 @@ function ProfileFormContent() {
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ fullName?: string; phone?: string }>({});
+  const fullNameInputRef = useRef<HTMLInputElement>(null);
+  const [validationCount, setValidationCount] = useState(0);
+  const pendingErrorFocusRef = useRef<boolean>(false);
+
+  // Focus the invalid fullName field only after React commits DOM error attributes
+  useEffect(() => {
+    if (validationCount > 0 && pendingErrorFocusRef.current) {
+      pendingErrorFocusRef.current = false;
+      fullNameInputRef.current?.focus();
+    }
+  }, [validationCount]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -51,7 +62,9 @@ function ProfileFormContent() {
         errors.fullName = 'Full name is required.';
       }
       if (Object.keys(errors).length > 0) {
+        pendingErrorFocusRef.current = true;
         setFieldErrors(errors);
+        setValidationCount((c) => c + 1);
         return;
       }
       setFieldErrors({});
@@ -185,6 +198,7 @@ function ProfileFormContent() {
                 Full Name <span className="text-rose-500" aria-hidden="true">*</span>
               </label>
               <input
+                ref={fullNameInputRef}
                 id="fullName"
                 type="text"
                 value={fullName}
@@ -197,9 +211,10 @@ function ProfileFormContent() {
                 className={inputClass}
                 required
                 aria-invalid={!!fieldErrors.fullName}
+                aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
               />
               {fieldErrors.fullName && (
-                <p className="mt-1 text-xs text-rose-600 font-medium" role="alert">
+                <p id="fullName-error" className="mt-1 text-xs text-rose-600 font-medium" role="alert">
                   {fieldErrors.fullName}
                 </p>
               )}
@@ -223,10 +238,11 @@ function ProfileFormContent() {
                   value={customer?.email || ''}
                   disabled
                   readOnly
+                  aria-describedby="email-hint"
                   className={`${inputClass} pl-10 cursor-not-allowed`}
                 />
               </div>
-              <p className="mt-1.5 text-xs text-stone-500">
+              <p id="email-hint" className="mt-1.5 text-xs text-stone-500">
                 Your past and future orders are associated with this email. To protect order history integrity, email changes are locked in prototype mode.
               </p>
             </div>

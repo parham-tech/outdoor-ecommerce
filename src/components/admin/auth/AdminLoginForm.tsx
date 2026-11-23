@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, type FormEvent } from 'react';
+import React, { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Eye,
@@ -36,6 +36,31 @@ export function AdminLoginForm() {
 
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const [validationCount, setValidationCount] = useState(0);
+  const pendingErrorFocusRef = useRef<'email' | 'password' | null>(null);
+  const submitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Focus the first invalid field only after React commits DOM error attributes
+  useEffect(() => {
+    if (validationCount > 0 && pendingErrorFocusRef.current) {
+      const target = pendingErrorFocusRef.current;
+      pendingErrorFocusRef.current = null;
+      if (target === 'email') {
+        emailInputRef.current?.focus();
+      } else if (target === 'password') {
+        passwordInputRef.current?.focus();
+      }
+    }
+  }, [validationCount]);
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
 
   // Client-Side Validation
   const validateForm = (): boolean => {
@@ -59,16 +84,18 @@ export function AdminLoginForm() {
 
     setFieldErrors(errors);
 
-    // Focus the first invalid field
-    if (errors.email) {
-      emailInputRef.current?.focus();
-      return false;
-    }
-    if (errors.password) {
-      passwordInputRef.current?.focus();
+    const hasErrors = Object.keys(errors).length > 0;
+    if (hasErrors) {
+      if (errors.email) {
+        pendingErrorFocusRef.current = 'email';
+      } else if (errors.password) {
+        pendingErrorFocusRef.current = 'password';
+      }
+      setValidationCount((c) => c + 1);
       return false;
     }
 
+    pendingErrorFocusRef.current = null;
     return true;
   };
 
@@ -84,8 +111,9 @@ export function AdminLoginForm() {
 
     setIsLoading(true);
 
+    if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
     // Simulate network authentication request
-    setTimeout(() => {
+    submitTimerRef.current = setTimeout(() => {
       setIsLoading(false);
 
       const normalizedEmail = email.trim().toLowerCase();
@@ -97,7 +125,8 @@ export function AdminLoginForm() {
 
       if (isDemoAdmin) {
         setBannerSuccess('Authentication verified. Redirecting to admin dashboard...');
-        setTimeout(() => {
+        if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+        redirectTimerRef.current = setTimeout(() => {
           router.push('/admin/dashboard');
         }, 800);
       } else {
@@ -123,9 +152,9 @@ export function AdminLoginForm() {
       <div className="bg-slate-850/90 bg-slate-900 border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/50 backdrop-blur-md">
         {/* Form Title & Subtitle */}
         <div className="mb-6 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-wide">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide">
             Administrator Sign In
-          </h2>
+          </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
             Enter your credentials to access the management portal.
           </p>

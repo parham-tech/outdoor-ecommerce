@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useMemo, type FormEvent } from 'react';
+import React, { useState, useRef, useMemo, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -69,6 +69,26 @@ export function CustomerRegisterForm() {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
   const termsCheckboxRef = useRef<HTMLInputElement>(null);
+
+  const [validationCount, setValidationCount] = useState(0);
+  const pendingErrorFocusRef = useRef<'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword' | 'agreeTerms' | null>(null);
+
+  // Focus the first invalid field only after React commits DOM error attributes
+  useEffect(() => {
+    if (validationCount > 0 && pendingErrorFocusRef.current) {
+      const target = pendingErrorFocusRef.current;
+      pendingErrorFocusRef.current = null;
+      const refMap: Record<'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword' | 'agreeTerms', React.RefObject<HTMLInputElement | null>> = {
+        firstName: firstNameRef,
+        lastName: lastNameRef,
+        email: emailInputRef,
+        password: passwordInputRef,
+        confirmPassword: confirmPasswordInputRef,
+        agreeTerms: termsCheckboxRef,
+      };
+      refMap[target]?.current?.focus();
+    }
+  }, [validationCount]);
 
   // Live Password Strength Calculation
   const criteriaList: PasswordCriteria[] = useMemo(() => {
@@ -145,22 +165,24 @@ export function CustomerRegisterForm() {
 
     setFieldErrors(errors);
 
-    // Focus first invalid element
-    if (errors.firstName) {
-      firstNameRef.current?.focus();
-    } else if (errors.lastName) {
-      lastNameRef.current?.focus();
-    } else if (errors.email) {
-      emailInputRef.current?.focus();
-    } else if (errors.password) {
-      passwordInputRef.current?.focus();
-    } else if (errors.confirmPassword) {
-      confirmPasswordInputRef.current?.focus();
-    } else if (errors.agreeTerms) {
-      termsCheckboxRef.current?.focus();
+    const hasErrors = Object.keys(errors).length > 0;
+    if (hasErrors) {
+      const order: ('firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword' | 'agreeTerms')[] = [
+        'firstName',
+        'lastName',
+        'email',
+        'password',
+        'confirmPassword',
+        'agreeTerms',
+      ];
+      const firstError = order.find((f) => errors[f]);
+      pendingErrorFocusRef.current = firstError ?? null;
+      setValidationCount((c) => c + 1);
+      return false;
     }
 
-    return Object.keys(errors).length === 0;
+    pendingErrorFocusRef.current = null;
+    return true;
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

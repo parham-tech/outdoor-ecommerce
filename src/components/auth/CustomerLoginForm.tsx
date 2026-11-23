@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, type FormEvent } from 'react';
+import React, { useState, useRef, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -45,9 +45,24 @@ export function CustomerLoginForm() {
   const [bannerError, setBannerError] = useState<string | null>(null);
   const [bannerSuccess, setBannerSuccess] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [validationCount, setValidationCount] = useState(0);
+  const pendingErrorFocusRef = useRef<'email' | 'password' | null>(null);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus the first invalid field only after React commits DOM error attributes
+  useEffect(() => {
+    if (validationCount > 0 && pendingErrorFocusRef.current) {
+      const target = pendingErrorFocusRef.current;
+      pendingErrorFocusRef.current = null;
+      if (target === 'email') {
+        emailInputRef.current?.focus();
+      } else if (target === 'password') {
+        passwordInputRef.current?.focus();
+      }
+    }
+  }, [validationCount]);
 
   // Client-Side Validation
   const validateForm = (): boolean => {
@@ -71,14 +86,19 @@ export function CustomerLoginForm() {
 
     setFieldErrors(errors);
 
-    // Set focus to the first invalid field
-    if (errors.email) {
-      emailInputRef.current?.focus();
-    } else if (errors.password) {
-      passwordInputRef.current?.focus();
+    const hasErrors = Object.keys(errors).length > 0;
+    if (hasErrors) {
+      if (errors.email) {
+        pendingErrorFocusRef.current = 'email';
+      } else if (errors.password) {
+        pendingErrorFocusRef.current = 'password';
+      }
+      setValidationCount((c) => c + 1);
+      return false;
     }
 
-    return Object.keys(errors).length === 0;
+    pendingErrorFocusRef.current = null;
+    return true;
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

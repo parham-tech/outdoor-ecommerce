@@ -113,22 +113,31 @@ export function ShopFilterSidebar({
         </button>
 
         {!collapsedSections.category && (
-          <div className="space-y-1.5 text-xs text-slate-600 font-medium pt-1">
+          <fieldset className="space-y-1 text-xs text-slate-600 font-medium pt-1 border-none p-0 m-0">
+            <legend className="sr-only">Product categories</legend>
             {/* All Gear Item */}
-            <button
-              type="button"
-              onClick={() => onSelectCategory('')}
-              className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md transition-colors text-left ${
+            <label
+              className={`flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-slate-50 cursor-pointer select-none transition-colors min-h-[32px] ${
                 selectedCategory === '' || selectedCategory === 'All gear'
                   ? 'bg-orange-50/70 text-orange-950 font-bold'
-                  : 'hover:bg-slate-50 text-slate-700 font-medium'
+                  : 'text-slate-700 font-medium'
               }`}
             >
-              <span>All gear</span>
-              <span className={selectedCategory === '' || selectedCategory === 'All gear' ? 'text-orange-900 font-bold' : 'text-slate-600 text-[11px]'}>
-                48
+              <span className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="product-category"
+                  value=""
+                  checked={selectedCategory === '' || selectedCategory === 'All gear'}
+                  onChange={() => onSelectCategory('')}
+                  className="rounded-full border-slate-300 text-[#A94900] focus:ring-[#A94900] w-4 h-4 cursor-pointer"
+                />
+                <span>All gear</span>
               </span>
-            </button>
+              <span className={selectedCategory === '' || selectedCategory === 'All gear' ? 'text-orange-900 font-bold' : 'text-slate-600 text-[11px]'}>
+                {SHOP_CATEGORIES.find((c) => c.id === 'all')?.count ?? 48}
+              </span>
+            </label>
 
             {/* Sub-categories */}
             {SHOP_CATEGORIES.filter((c) => c.id !== 'all').map((cat) => {
@@ -136,18 +145,20 @@ export function ShopFilterSidebar({
               return (
                 <label
                   key={cat.id}
-                  className="flex items-center justify-between px-2.5 py-1 rounded hover:bg-slate-50 cursor-pointer select-none transition-colors"
+                  className={`flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-slate-50 cursor-pointer select-none transition-colors min-h-[32px] ${
+                    isSelected ? 'bg-orange-50/40 text-slate-900 font-semibold' : 'text-slate-700'
+                  }`}
                 >
                   <span className="flex items-center gap-2">
                     <input
-                      type="checkbox"
+                      type="radio"
+                      name="product-category"
+                      value={cat.name}
                       checked={isSelected}
-                      onChange={() => onSelectCategory(isSelected ? '' : cat.name)}
-                      className="rounded border-slate-300 text-orange-500 focus:ring-orange-400 w-3.5 h-3.5"
+                      onChange={() => onSelectCategory(cat.name)}
+                      className="rounded-full border-slate-300 text-[#A94900] focus:ring-[#A94900] w-4 h-4 cursor-pointer"
                     />
-                    <span className={isSelected ? 'text-slate-900 font-semibold' : 'text-slate-700'}>
-                      {cat.name}
-                    </span>
+                    <span>{cat.name}</span>
                   </span>
                   <span className="text-slate-600 text-[11px] font-normal">
                     {cat.count}
@@ -155,7 +166,7 @@ export function ShopFilterSidebar({
                 </label>
               );
             })}
-          </div>
+          </fieldset>
         )}
       </div>
 
@@ -251,7 +262,7 @@ export function ShopFilterSidebar({
             {ACTIVITY_FACETS.map((act) => {
               const isChecked = selectedActivities.includes(act);
               return (
-                <label key={act} className="flex items-center gap-2 cursor-pointer select-none">
+                <label key={act} className="flex items-center gap-2 cursor-pointer select-none min-h-[28px] py-0.5">
                   <input
                     type="checkbox"
                     checked={isChecked}
@@ -287,7 +298,7 @@ export function ShopFilterSidebar({
             {FEATURE_FACETS.map((feat) => {
               const isChecked = selectedFeatures.includes(feat);
               return (
-                <label key={feat} className="flex items-center gap-2 cursor-pointer select-none">
+                <label key={feat} className="flex items-center gap-2 cursor-pointer select-none min-h-[28px] py-0.5">
                   <input
                     type="checkbox"
                     checked={isChecked}
