@@ -432,7 +432,7 @@ export function BulkProductImportModal({
             }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
+            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 focus-within:ring-offset-slate-900 focus-within:border-orange-500 ${
               isDragging
                 ? 'border-orange-500 bg-orange-500/10'
                 : 'border-slate-800 bg-slate-950/50 hover:border-slate-700 hover:bg-slate-950'
@@ -443,6 +443,7 @@ export function BulkProductImportModal({
               ref={fileInputRef}
               type="file"
               accept=".csv,.xlsx,.xls,.tsv,.txt"
+              aria-label="Upload product spreadsheet file (CSV, Excel)"
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
                   handleFile(e.target.files[0]);
@@ -489,7 +490,7 @@ export function BulkProductImportModal({
                 setFileName(null);
                 setParseError(null);
               }}
-              className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800"
+              className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer"
             >
               Choose different file
             </button>

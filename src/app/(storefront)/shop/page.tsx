@@ -136,11 +136,11 @@ export default function ShopPage() {
       {/* 6. Main Catalog Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1 w-full">
         {/* Mobile Filter Toggle Bar (< 1024px) */}
-        <div className="lg:hidden mb-6 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
+        <div className="lg:hidden mb-6 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-2.5">
           <button
             type="button"
             onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-            className="inline-flex items-center gap-2 text-sm font-bold text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-md"
+            className="inline-flex items-center gap-2 py-2 px-3 min-h-[40px] text-sm font-bold text-slate-800 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] rounded-lg transition-colors cursor-pointer"
             aria-expanded={isMobileFilterOpen}
             aria-controls="mobile-filter-drawer"
           >
@@ -164,7 +164,7 @@ export default function ShopPage() {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-xs font-semibold text-[#A94900] hover:text-[#8F3E00]"
+              className="py-1.5 px-3 min-h-[36px] inline-flex items-center rounded-lg text-xs font-semibold text-[#A94900] hover:text-[#8F3E00] hover:bg-orange-50/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] cursor-pointer"
             >
               Reset
             </button>

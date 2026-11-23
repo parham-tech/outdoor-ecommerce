@@ -151,9 +151,9 @@ export function ProductFeaturesDeepDive({
         {/* In the Bag Callout Box */}
         {inTheBag && (
           <div className="border border-slate-200 rounded-xl p-4 sm:p-5 bg-white shadow-2xs">
-            <h5 className="text-xs font-bold text-slate-900 mb-1.5 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-slate-900 mb-1.5 uppercase tracking-wider">
               In the bag
-            </h5>
+            </h4>
             <p className="text-xs text-slate-600 leading-relaxed font-normal">
               {inTheBag}
             </p>
