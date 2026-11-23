@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen flex flex-col bg-[#F7F5F0]">
       {/* Main Content Area */}
-      <main id="main-content" className="flex-1">
+      <div className="flex-1">
         <Hero />
         <FeaturesBar />
         <FeaturedCategories />
@@ -19,7 +19,7 @@ export default function HomePage() {
         <FeaturedProducts products={MOCK_FEATURED_PRODUCTS} />
         <GoFurtherBanner />
         <NewsletterSection />
-      </main>
+      </div>
     </div>
   );
 }

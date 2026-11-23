@@ -67,7 +67,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       <ProductBreadcrumbs category={product.category} productName={product.name} />
 
       {/* 4. Product Hero Section (Gallery Left + Purchasing Form Right) */}
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12 w-full flex-1">
+      <section aria-label="Product overview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12 w-full flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Media Column (7 Cols on lg) */}
           <div className="lg:col-span-7">
@@ -98,7 +98,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             />
           </div>
         </div>
-      </main>
+      </section>
 
       {/* 5. Sticky Section Tabs */}
       <ProductStickyTabs reviewCount={product.reviewCount} />

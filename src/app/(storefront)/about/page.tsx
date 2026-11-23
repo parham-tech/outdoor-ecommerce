@@ -21,7 +21,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-800 antialiased selection:bg-orange-500 selection:text-white">
       {/* Main Page Content */}
-      <main id="main-content" className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {/* Section 1: Hero Banner */}
         <AboutHero />
 
@@ -33,7 +33,7 @@ export default function AboutPage() {
 
         {/* Section 4: Call to Action Banner leading to /shop */}
         <AboutCtaBanner ctaHref="/shop" />
-      </main>
+      </div>
     </div>
   );
 }

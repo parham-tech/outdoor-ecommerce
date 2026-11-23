@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 
 interface FormState {
@@ -45,6 +45,13 @@ export function ContactForm() {
   const emailRef = useRef<HTMLInputElement>(null);
   const subjectRef = useRef<HTMLSelectElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const confirmationHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (isSubmitted) {
+      confirmationHeadingRef.current?.focus();
+    }
+  }, [isSubmitted]);
 
   const validate = (data: FormState): FormErrors => {
     const errs: FormErrors = {};
@@ -168,8 +175,6 @@ export function ContactForm() {
 
       {isSubmitted && lastSubmission ? (
         <div
-          role="status"
-          aria-live="polite"
           className="bg-amber-50/90 border border-amber-200 rounded-xl p-5 sm:p-6 text-slate-800 space-y-4"
         >
           <div className="flex items-start gap-3">
@@ -188,7 +193,11 @@ export function ContactForm() {
               </svg>
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-amber-900">
+              <h3
+                ref={confirmationHeadingRef}
+                tabIndex={-1}
+                className="text-sm sm:text-base font-bold text-amber-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"
+              >
                 Inquiry Validated (Demonstration Mode)
               </h3>
               <p className="text-xs sm:text-sm text-amber-800/90 mt-1 leading-relaxed">

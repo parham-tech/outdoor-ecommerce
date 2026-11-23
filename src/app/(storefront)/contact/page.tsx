@@ -20,7 +20,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-800 antialiased selection:bg-orange-500 selection:text-white">
       {/* Main Page Content */}
-      <main id="main-content" className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {/* Section 1: Hero Banner */}
         <ContactHero />
 
@@ -29,7 +29,7 @@ export default function ContactPage() {
 
         {/* Section 3: Quick Help Self-Service Navigation */}
         <ContactQuickHelp />
-      </main>
+      </div>
     </div>
   );
 }

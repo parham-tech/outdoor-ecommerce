@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function AdminDashboardPage() {
   return (
-    <main id="admin-main-content" className="space-y-6">
+    <main id="main-content" tabIndex={-1} className="space-y-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500/60">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
         <div>

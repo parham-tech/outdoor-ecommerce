@@ -26,10 +26,10 @@ import type { CustomerProfile } from '@/types/customer';
 // Field helpers
 // ---------------------------------------------------------------------------
 
-function FieldError({ message }: { message?: string }) {
+function FieldError({ id, message }: { id?: string; message?: string }) {
   if (!message) return null;
   return (
-    <p className="text-xs text-rose-600 mt-1" role="alert" aria-live="polite">
+    <p id={id} className="text-xs text-rose-600 mt-1 font-medium" role="alert">
       {message}
     </p>
   );
@@ -55,7 +55,7 @@ function FormField({
         {required && <span className="text-rose-500 ml-0.5" aria-hidden="true">*</span>}
       </label>
       {children}
-      <FieldError message={error} />
+      <FieldError id={error ? `${id}-error` : undefined} message={error} />
     </div>
   );
 }
@@ -308,7 +308,7 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                       className={inputClass}
                       aria-required="true"
                       aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
-                      aria-invalid={!!fieldErrors.fullName}
+                      aria-invalid={fieldErrors.fullName ? 'true' : undefined}
                     />
                   </FormField>
                   <FormField label="Email Address" id="email" required error={fieldErrors.email}>
@@ -321,7 +321,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                       onChange={handleCustomerChange}
                       className={inputClass}
                       aria-required="true"
-                      aria-invalid={!!fieldErrors.email}
+                      aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                      aria-invalid={fieldErrors.email ? 'true' : undefined}
                     />
                   </FormField>
                   <FormField label="Phone Number" id="phone" required error={fieldErrors.phone}>
@@ -334,7 +335,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                       onChange={handleCustomerChange}
                       className={inputClass}
                       aria-required="true"
-                      aria-invalid={!!fieldErrors.phone}
+                      aria-describedby={fieldErrors.phone ? 'phone-error' : undefined}
+                      aria-invalid={fieldErrors.phone ? 'true' : undefined}
                     />
                   </FormField>
                 </div>
@@ -364,7 +366,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                       onChange={handleAddressChange}
                       className={inputClass}
                       aria-required="true"
-                      aria-invalid={!!fieldErrors.shipFullName}
+                      aria-describedby={fieldErrors.shipFullName ? 'shipFullName-error' : undefined}
+                      aria-invalid={fieldErrors.shipFullName ? 'true' : undefined}
                     />
                   </FormField>
                   <FormField
@@ -382,7 +385,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                       onChange={handleAddressChange}
                       className={inputClass}
                       aria-required="true"
-                      aria-invalid={!!fieldErrors.streetAddress}
+                      aria-describedby={fieldErrors.streetAddress ? 'streetAddress-error' : undefined}
+                      aria-invalid={fieldErrors.streetAddress ? 'true' : undefined}
                     />
                   </FormField>
                   <FormField label="Apartment / Unit (optional)" id="unit">
@@ -407,7 +411,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                         onChange={handleAddressChange}
                         className={inputClass}
                         aria-required="true"
-                        aria-invalid={!!fieldErrors.city}
+                        aria-describedby={fieldErrors.city ? 'city-error' : undefined}
+                        aria-invalid={fieldErrors.city ? 'true' : undefined}
                       />
                     </FormField>
                     <FormField
@@ -425,7 +430,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                         onChange={handleAddressChange}
                         className={inputClass}
                         aria-required="true"
-                        aria-invalid={!!fieldErrors.state}
+                        aria-describedby={fieldErrors.state ? 'state-error' : undefined}
+                        aria-invalid={fieldErrors.state ? 'true' : undefined}
                       />
                     </FormField>
                   </div>
@@ -445,7 +451,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                         onChange={handleAddressChange}
                         className={inputClass}
                         aria-required="true"
-                        aria-invalid={!!fieldErrors.postalCode}
+                        aria-describedby={fieldErrors.postalCode ? 'postalCode-error' : undefined}
+                        aria-invalid={fieldErrors.postalCode ? 'true' : undefined}
                       />
                     </FormField>
                     <FormField label="Country" id="country" required error={fieldErrors.country}>
@@ -457,7 +464,8 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                         onChange={handleAddressChange}
                         className={inputClass}
                         aria-required="true"
-                        aria-invalid={!!fieldErrors.country}
+                        aria-describedby={fieldErrors.country ? 'country-error' : undefined}
+                        aria-invalid={fieldErrors.country ? 'true' : undefined}
                       >
                         <option value="US">United States</option>
                         <option value="CA">Canada</option>
@@ -474,13 +482,10 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
               </section>
 
               {/* Delivery Method */}
-              <section aria-labelledby="delivery-heading">
-                <h2
-                  id="delivery-heading"
-                  className="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-200"
-                >
+              <fieldset className="border-0 p-0 m-0">
+                <legend className="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-200 w-full block">
                   Delivery Method
-                </h2>
+                </legend>
                 <div className="space-y-3">
                   {/* Standard */}
                   <label
@@ -548,7 +553,7 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                     </div>
                   </label>
                 </div>
-              </section>
+              </fieldset>
 
               {/* Simulated Payment Notice */}
               <section aria-labelledby="payment-heading">

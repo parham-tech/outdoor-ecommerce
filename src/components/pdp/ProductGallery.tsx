@@ -40,9 +40,8 @@ export function ProductGallery({
         {/* Main Product Image */}
         <div
           className={`relative w-full h-72 sm:h-96 flex items-center justify-center transition-transform duration-300 ${
-            isZoomed ? 'scale-125 cursor-zoom-out' : 'group-hover:scale-105 cursor-zoom-in'
+            isZoomed ? 'scale-125' : 'group-hover:scale-105'
           }`}
-          onClick={() => setIsZoomed(!isZoomed)}
         >
           <Image
             src={currentImage.src}
@@ -58,7 +57,7 @@ export function ProductGallery({
         <button
           type="button"
           onClick={() => setIsZoomed(!isZoomed)}
-          className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-slate-700 p-2 rounded-full border border-slate-200 shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+          className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-slate-700 p-2 rounded-full border border-slate-200 shadow-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-700"
           aria-label={isZoomed ? 'Zoom out image' : 'Zoom in image'}
           title={isZoomed ? 'Zoom out' : 'Zoom in'}
         >
@@ -85,9 +84,9 @@ export function ProductGallery({
                   setActiveIndex(idx);
                   setIsZoomed(false);
                 }}
-                className={`relative aspect-[4/3] rounded-lg p-1.5 bg-[#f8f9fa] overflow-hidden focus:outline-none transition-all ${
+                className={`relative aspect-[4/3] rounded-lg p-1.5 bg-[#f8f9fa] overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2 transition-all ${
                   isActive
-                    ? 'border-2 border-orange-500 shadow-xs ring-1 ring-orange-500/30'
+                    ? 'border-2 border-orange-600 shadow-xs ring-1 ring-orange-600/30'
                     : 'border border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100'
                 }`}
                 aria-label={`View photo ${idx + 1} of ${images.length}`}

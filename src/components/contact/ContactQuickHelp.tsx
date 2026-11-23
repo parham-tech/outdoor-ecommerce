@@ -45,7 +45,7 @@ export function ContactQuickHelp() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-          <span className="text-xs font-bold uppercase tracking-wider text-orange-600 select-none">
+          <span className="text-xs font-bold uppercase tracking-wider text-orange-700 select-none">
             Self-Service Resources
           </span>
           <h2
@@ -66,10 +66,10 @@ export function ContactQuickHelp() {
               className="bg-white rounded-xl border border-slate-200/80 p-6 flex flex-col justify-between shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all duration-150 group"
             >
               <div>
-                <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase select-none">
+                <span className="text-[10px] font-bold tracking-widest text-slate-600 uppercase select-none">
                   {card.tag}
                 </span>
-                <h3 className="text-base font-bold text-slate-900 mt-1 group-hover:text-orange-600 transition-colors">
+                <h3 className="text-base font-bold text-slate-900 mt-1 group-hover:text-orange-700 transition-colors">
                   {card.title}
                 </h3>
                 <p className="text-xs sm:text-[13px] text-slate-500 mt-2 leading-relaxed">
@@ -80,7 +80,7 @@ export function ContactQuickHelp() {
               <div className="pt-4 mt-4 border-t border-slate-100">
                 <Link
                   href={card.href}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 hover:text-orange-600 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-orange-500 rounded-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 hover:text-orange-700 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-orange-700 rounded-sm"
                 >
                   <span>{card.linkLabel}</span>
                   <span

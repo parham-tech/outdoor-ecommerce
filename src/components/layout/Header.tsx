@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
@@ -144,13 +144,17 @@ export function Header({
 
   const containerClass = `${positioningClass} ${visualClass} ${transformClass} text-white transition-all duration-300 ease-in-out motion-reduce:transition-none`;
 
+  const handleCloseMenu = useCallback(() => {
+    setIsMenuOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
+
   // Close overlays on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (isMenuOpen) {
-          setIsMenuOpen(false);
-          menuButtonRef.current?.focus();
+          handleCloseMenu();
         }
         if (isSearchOpen) {
           setIsSearchOpen(false);
@@ -160,7 +164,56 @@ export function Header({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMenuOpen, isSearchOpen]);
+  }, [isMenuOpen, isSearchOpen, handleCloseMenu]);
+
+  // Focus trap inside mobile navigation drawer
+  const handleDrawerFocusTrap = useCallback((e: KeyboardEvent) => {
+    if (!drawerRef.current || e.key !== 'Tab') return;
+
+    const selector =
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusableElements = Array.from(
+      drawerRef.current.querySelectorAll<HTMLElement>(selector)
+    ).filter(
+      (el) =>
+        !el.hasAttribute('disabled') &&
+        el.getAttribute('aria-hidden') !== 'true' &&
+        el.tabIndex >= 0 &&
+        (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0)
+    );
+
+    if (focusableElements.length === 0) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === firstElement || !drawerRef.current.contains(document.activeElement)) {
+        e.preventDefault();
+        lastElement.focus();
+      }
+    } else {
+      if (document.activeElement === lastElement || !drawerRef.current.contains(document.activeElement)) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        handleDrawerFocusTrap(e);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMenuOpen, handleDrawerFocusTrap]);
 
   // Lock body scroll while mobile drawer is open
   useEffect(() => {
@@ -187,7 +240,10 @@ export function Header({
   // Set focus into drawer when opened
   useEffect(() => {
     if (isMenuOpen) {
-      drawerCloseButtonRef.current?.focus();
+      const timer = setTimeout(() => {
+        drawerCloseButtonRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isMenuOpen]);
 
@@ -472,10 +528,7 @@ export function Header({
           {/* Dark Backdrop Scrim */}
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
-            onClick={() => {
-              setIsMenuOpen(false);
-              menuButtonRef.current?.focus();
-            }}
+            onClick={handleCloseMenu}
             aria-hidden="true"
           />
 
@@ -502,10 +555,7 @@ export function Header({
               <button
                 ref={drawerCloseButtonRef}
                 type="button"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  menuButtonRef.current?.focus();
-                }}
+                onClick={handleCloseMenu}
                 className="p-2 text-slate-400 hover:text-white rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
                 aria-label="Close navigation menu"
               >
@@ -529,7 +579,7 @@ export function Header({
                     key={link.label}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center justify-between py-3 px-4 rounded-xl text-base font-semibold transition-colors min-h-[48px] ${
+                    className={`flex items-center justify-between py-3 px-4 rounded-xl text-base font-semibold transition-colors min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
                       isActive
                         ? 'text-[#f97316] bg-white/5 font-bold border-l-2 border-[#f97316]'
                         : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -549,7 +599,7 @@ export function Header({
               <Link
                 href={accountHref}
                 onClick={() => setIsMenuOpen(false)}
-                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px]"
+                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               >
                 <span className="flex items-center gap-2 font-medium">
                   <Image
@@ -574,7 +624,7 @@ export function Header({
                   setIsMenuOpen(false);
                   openDrawer();
                 }}
-                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] cursor-pointer"
+                className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-slate-300 hover:bg-white/5 transition-colors min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
                 aria-label={`Open shopping cart with ${displayCartCount} items`}
               >
                 <span className="flex items-center gap-2 font-medium">

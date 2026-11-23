@@ -34,7 +34,12 @@ export function ShopCatalogGrid({
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200"
         data-purpose="catalog-toolbar"
       >
-        <p className="text-xs text-slate-500 font-medium">
+        <p
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="text-xs text-slate-500 font-medium"
+        >
           Showing <span className="font-bold text-slate-900">{products.length > 0 ? `1–${products.length}` : '0'}</span> of{' '}
           <span className="font-bold text-slate-900">{totalProductCount}</span> products
         </p>

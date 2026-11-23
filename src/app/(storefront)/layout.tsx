@@ -21,9 +21,9 @@ export default function StorefrontLayout({
           <Suspense fallback={<HeaderFallback />}>
             <Header />
           </Suspense>
-          <div className="flex-1 flex flex-col">
+          <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500/60">
             {children}
-          </div>
+          </main>
           <Footer />
           <CartDrawer />
         </div>

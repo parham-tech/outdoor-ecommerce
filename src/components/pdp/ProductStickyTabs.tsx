@@ -51,9 +51,9 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#description"
             onClick={(e) => handleTabClick(e, 'description')}
-            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 ${
+            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'description'
-                ? 'text-[#e86c1e] border-[#e86c1e] font-bold'
+                ? 'text-[#c2410c] border-[#c2410c] font-bold'
                 : 'text-slate-500 border-transparent hover:text-slate-900'
             }`}
           >
@@ -63,9 +63,9 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#features"
             onClick={(e) => handleTabClick(e, 'features')}
-            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 ${
+            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'features'
-                ? 'text-[#e86c1e] border-[#e86c1e] font-bold'
+                ? 'text-[#c2410c] border-[#c2410c] font-bold'
                 : 'text-slate-500 border-transparent hover:text-slate-900'
             }`}
           >
@@ -75,9 +75,9 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#specifications"
             onClick={(e) => handleTabClick(e, 'specifications')}
-            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 ${
+            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'specifications'
-                ? 'text-[#e86c1e] border-[#e86c1e] font-bold'
+                ? 'text-[#c2410c] border-[#c2410c] font-bold'
                 : 'text-slate-500 border-transparent hover:text-slate-900'
             }`}
           >
@@ -87,9 +87,9 @@ export function ProductStickyTabs({ reviewCount }: ProductStickyTabsProps) {
           <a
             href="#reviews"
             onClick={(e) => handleTabClick(e, 'reviews')}
-            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 ${
+            className={`py-3.5 border-b-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 ${
               activeTab === 'reviews'
-                ? 'text-[#e86c1e] border-[#e86c1e] font-bold'
+                ? 'text-[#c2410c] border-[#c2410c] font-bold'
                 : 'text-slate-500 border-transparent hover:text-slate-900'
             }`}
           >

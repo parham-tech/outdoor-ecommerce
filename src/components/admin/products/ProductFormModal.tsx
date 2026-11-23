@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Plus, Trash2, Image as ImageIcon, AlertCircle, Check } from 'lucide-react';
 import { AdminModal } from '@/components/admin/ui/AdminModal';
@@ -14,6 +14,15 @@ import {
 } from '@/lib/mock/admin-products-data';
 import type { AdminProductItem, ProductFormErrors } from '@/types/admin-product';
 import type { ProductMutationResult } from '@/hooks/useAdminProductsState';
+
+const VALIDATION_FOCUS_ORDER = [
+  { key: 'name', id: 'prod-form-name' },
+  { key: 'sku', id: 'prod-form-sku' },
+  { key: 'priceUsd', id: 'prod-form-price' },
+  { key: 'salePriceUsd', id: 'prod-form-sale-price' },
+  { key: 'inventory', id: 'prod-form-inventory' },
+  { key: 'description', id: 'prod-form-desc' },
+] as const;
 
 export interface ProductFormModalProps {
   isOpen: boolean;
@@ -97,6 +106,7 @@ function ProductFormContent({
   const [errors, setErrors] = useState<ProductFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreviewError, setImagePreviewError] = useState(false);
+  const pendingErrorFocusRef = useRef<string | null>(null);
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -138,7 +148,7 @@ function ProductFormContent({
   const parsedInventory = parseInt(inventory, 10) || 0;
   const previewStockStatus = calculateStockStatus(parsedInventory);
 
-  const validate = (): boolean => {
+  const validate = (): { isValid: boolean; errors: ProductFormErrors } => {
     const errs: ProductFormErrors = {};
 
     if (!name.trim()) {
@@ -170,13 +180,32 @@ function ProductFormContent({
     }
 
     setErrors(errs);
-    return Object.keys(errs).length === 0;
+    return { isValid: Object.keys(errs).length === 0, errors: errs };
   };
+
+  // Move focus to first invalid input after React renders updated aria-invalid / aria-describedby
+  useEffect(() => {
+    if (pendingErrorFocusRef.current) {
+      const targetId = pendingErrorFocusRef.current;
+      pendingErrorFocusRef.current = null;
+      const targetElement = document.getElementById(targetId);
+      if (targetElement && typeof targetElement.focus === 'function') {
+        targetElement.focus();
+      }
+    }
+  }, [errors]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validate()) return;
+    const { isValid, errors: validationErrors } = validate();
+    if (!isValid) {
+      const firstInvalid = VALIDATION_FOCUS_ORDER.find(({ key }) => validationErrors[key]);
+      if (firstInvalid) {
+        pendingErrorFocusRef.current = firstInvalid.id;
+      }
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -369,7 +398,7 @@ function ProductFormContent({
                 onChange={(e) => setPriceUsd(e.target.value)}
                 placeholder="289.99"
                 aria-invalid={Boolean(errors.priceUsd)}
-                aria-describedby="prod-price-help"
+                aria-describedby={errors.priceUsd ? 'prod-price-help prod-price-error' : 'prod-price-help'}
                 className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700/80 text-sm text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
               />
             </div>
@@ -377,7 +406,7 @@ function ProductFormContent({
               {priceInCents > 0 ? `${formatPriceFromCents(priceInCents)} (${priceInCents} cents)` : 'Enter price in USD'}
             </p>
             {errors.priceUsd && (
-              <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+              <p id="prod-price-error" className="text-xs text-red-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{errors.priceUsd}</span>
               </p>
@@ -405,6 +434,7 @@ function ProductFormContent({
                 onChange={(e) => setSalePriceUsd(e.target.value)}
                 placeholder="249.99"
                 aria-invalid={Boolean(errors.salePriceUsd)}
+                aria-describedby={errors.salePriceUsd ? 'prod-sale-price-error' : undefined}
                 className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700/80 text-sm text-emerald-400 font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
               />
             </div>
@@ -412,7 +442,7 @@ function ProductFormContent({
               {salePriceInCents ? formatPriceFromCents(salePriceInCents) : 'Leave blank if no sale'}
             </p>
             {errors.salePriceUsd && (
-              <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+              <p id="prod-sale-price-error" className="text-xs text-red-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{errors.salePriceUsd}</span>
               </p>
@@ -436,6 +466,7 @@ function ProductFormContent({
               onChange={(e) => setInventory(e.target.value)}
               placeholder="10"
               aria-invalid={Boolean(errors.inventory)}
+              aria-describedby={errors.inventory ? 'prod-inventory-error' : undefined}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700/80 text-sm text-white font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
             />
             <div className="mt-1 flex items-center gap-2">
@@ -443,7 +474,7 @@ function ProductFormContent({
               <AdminStockStatusBadge stock={parsedInventory} status={previewStockStatus} />
             </div>
             {errors.inventory && (
-              <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+              <p id="prod-inventory-error" className="text-xs text-red-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{errors.inventory}</span>
               </p>
@@ -467,10 +498,11 @@ function ProductFormContent({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Detailed description of features, materials, and recommended outdoor activities..."
           aria-invalid={Boolean(errors.description)}
+          aria-describedby={errors.description ? 'prod-desc-error' : undefined}
           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700/80 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all resize-y"
         />
         {errors.description && (
-          <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+          <p id="prod-desc-error" className="text-xs text-red-400 mt-1 flex items-center gap-1">
             <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{errors.description}</span>
           </p>

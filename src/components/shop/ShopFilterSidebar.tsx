@@ -91,7 +91,7 @@ export function ShopFilterSidebar({
           <button
             type="button"
             onClick={onResetFilters}
-            className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors focus-visible:outline-none focus-visible:underline"
+            className="text-xs font-semibold text-orange-700 hover:text-orange-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
           >
             Clear all
           </button>
@@ -103,11 +103,11 @@ export function ShopFilterSidebar({
         <button
           type="button"
           onClick={() => toggleSection('category')}
-          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
+          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
           aria-expanded={!collapsedSections.category}
         >
           <span>Category</span>
-          <span className="text-slate-400 text-base font-light select-none">
+          <span className="text-slate-600 text-base font-medium select-none">
             {collapsedSections.category ? '+' : '−'}
           </span>
         </button>
@@ -125,7 +125,7 @@ export function ShopFilterSidebar({
               }`}
             >
               <span>All gear</span>
-              <span className={selectedCategory === '' || selectedCategory === 'All gear' ? 'text-orange-900 font-bold' : 'text-slate-400 text-[11px]'}>
+              <span className={selectedCategory === '' || selectedCategory === 'All gear' ? 'text-orange-900 font-bold' : 'text-slate-600 text-[11px]'}>
                 48
               </span>
             </button>
@@ -149,7 +149,7 @@ export function ShopFilterSidebar({
                       {cat.name}
                     </span>
                   </span>
-                  <span className="text-slate-400 text-[11px] font-normal">
+                  <span className="text-slate-600 text-[11px] font-normal">
                     {cat.count}
                   </span>
                 </label>
@@ -164,11 +164,11 @@ export function ShopFilterSidebar({
         <button
           type="button"
           onClick={() => toggleSection('price')}
-          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
+          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
           aria-expanded={!collapsedSections.price}
         >
           <span>Price</span>
-          <span className="text-slate-400 text-base font-light select-none">
+          <span className="text-slate-600 text-base font-medium select-none">
             {collapsedSections.price ? '+' : '−'}
           </span>
         </button>
@@ -209,7 +209,7 @@ export function ShopFilterSidebar({
                   value={minPrice}
                   onChange={handleMinPriceChange}
                   aria-label="Minimum price in dollars"
-                  className="w-full pl-6 pr-2 py-1.5 text-xs text-slate-800 border border-slate-200 rounded-md focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  className="w-full pl-6 pr-2 py-1.5 text-xs text-slate-800 border border-slate-200 rounded-md focus:border-orange-600 focus:ring-2 focus:ring-orange-600"
                 />
               </div>
 
@@ -224,7 +224,7 @@ export function ShopFilterSidebar({
                   value={maxPrice}
                   onChange={handleMaxPriceChange}
                   aria-label="Maximum price in dollars"
-                  className="w-full pl-6 pr-2 py-1.5 text-xs text-slate-800 border border-slate-200 rounded-md focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  className="w-full pl-6 pr-2 py-1.5 text-xs text-slate-800 border border-slate-200 rounded-md focus:border-orange-600 focus:ring-2 focus:ring-orange-600"
                 />
               </div>
             </div>
@@ -237,11 +237,11 @@ export function ShopFilterSidebar({
         <button
           type="button"
           onClick={() => toggleSection('activity')}
-          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
+          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
           aria-expanded={!collapsedSections.activity}
         >
           <span>Activity</span>
-          <span className="text-slate-400 text-base font-light select-none">
+          <span className="text-slate-600 text-base font-medium select-none">
             {collapsedSections.activity ? '+' : '−'}
           </span>
         </button>
@@ -273,11 +273,11 @@ export function ShopFilterSidebar({
         <button
           type="button"
           onClick={() => toggleSection('features')}
-          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
+          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
           aria-expanded={!collapsedSections.features}
         >
           <span>Features</span>
-          <span className="text-slate-400 text-base font-light select-none">
+          <span className="text-slate-600 text-base font-medium select-none">
             {collapsedSections.features ? '+' : '−'}
           </span>
         </button>
@@ -309,11 +309,11 @@ export function ShopFilterSidebar({
         <button
           type="button"
           onClick={() => toggleSection('rating')}
-          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"
+          className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
           aria-expanded={!collapsedSections.rating}
         >
           <span>Customer rating</span>
-          <span className="text-slate-400 text-base font-light select-none">
+          <span className="text-slate-600 text-base font-medium select-none">
             {collapsedSections.rating ? '+' : '−'}
           </span>
         </button>
@@ -332,7 +332,7 @@ export function ShopFilterSidebar({
                   4 stars &amp; up
                 </span>
               </span>
-              <span className="text-slate-400 text-[11px]">35</span>
+              <span className="text-slate-600 text-[11px]">35</span>
             </label>
           </div>
         )}
@@ -361,7 +361,7 @@ export function ShopFilterSidebar({
         </p>
         <Link
           href="/contact"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 hover:text-orange-600 pt-1 group focus-visible:outline-none focus-visible:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 hover:text-orange-700 pt-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 rounded-xs"
         >
           <span>Talk to a gear expert</span>
           <span className="group-hover:translate-x-0.5 transition-transform" aria-hidden="true">

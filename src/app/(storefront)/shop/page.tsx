@@ -134,7 +134,7 @@ export default function ShopPage() {
       />
 
       {/* 6. Main Catalog Content Area */}
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1 w-full">
         {/* Mobile Filter Toggle Bar (< 1024px) */}
         <div className="lg:hidden mb-6 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3">
           <button
@@ -230,7 +230,7 @@ export default function ShopPage() {
             />
           </div>
         </div>
-      </main>
+      </div>
 
       {/* 7. Trust Value Props Bar */}
       <ShopTrustBar />

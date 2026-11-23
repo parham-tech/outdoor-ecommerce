@@ -138,22 +138,28 @@ export function ProductCard({
 
             {/* Color Swatch Dots */}
             {shopProduct.colorSwatches && shopProduct.colorSwatches.length > 0 && (
-              <div className="flex items-center gap-1.5 pt-1">
+              <div className="flex items-center gap-1 pt-0.5">
                 {shopProduct.colorSwatches.map((color, idx) => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => setSelectedColorIndex(idx)}
-                    style={{ backgroundColor: color }}
-                    className={`w-2.5 h-2.5 rounded-full transition-all focus-visible:outline-none ${
-                      selectedColorIndex === idx
-                        ? 'ring-2 ring-slate-800 ring-offset-1 scale-110'
-                        : 'ring-1 ring-slate-300 hover:scale-105'
-                    }`}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-1 group/swatch cursor-pointer"
                     aria-label={`Select color option ${idx + 1}`}
-                  />
+                    aria-pressed={selectedColorIndex === idx}
+                  >
+                    <span
+                      style={{ backgroundColor: color }}
+                      className={`w-2.5 h-2.5 rounded-full transition-all pointer-events-none ${
+                        selectedColorIndex === idx
+                          ? 'ring-2 ring-slate-800 ring-offset-1 scale-110'
+                          : 'ring-1 ring-slate-300 group-hover/swatch:scale-105'
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </button>
                 ))}
-                <span className="text-[10px] text-slate-400 ml-1">
+                <span className="text-[10px] text-slate-400 ml-1.5 select-none">
                   {shopProduct.colorCount ?? shopProduct.colorSwatches.length} color{(shopProduct.colorCount ?? shopProduct.colorSwatches.length) > 1 ? 's' : ''}
                 </span>
               </div>

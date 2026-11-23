@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -34,6 +34,66 @@ export function CartDrawer() {
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+
+  const pendingFocusIndexRef = useRef<number | null>(null);
+  const removeButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const emptyCartHeadingRef = useRef<HTMLHeadingElement>(null);
+  const [removalAnnouncement, setRemovalAnnouncement] = useState('');
+  const removalReinsertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const removalClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const triggerRemovalAnnouncement = (message: string) => {
+    if (removalReinsertTimerRef.current) {
+      clearTimeout(removalReinsertTimerRef.current);
+      removalReinsertTimerRef.current = null;
+    }
+    if (removalClearTimerRef.current) {
+      clearTimeout(removalClearTimerRef.current);
+      removalClearTimerRef.current = null;
+    }
+
+    setRemovalAnnouncement('');
+
+    removalReinsertTimerRef.current = setTimeout(() => {
+      setRemovalAnnouncement(message);
+      removalReinsertTimerRef.current = null;
+
+      removalClearTimerRef.current = setTimeout(() => {
+        setRemovalAnnouncement('');
+        removalClearTimerRef.current = null;
+      }, 3000);
+    }, 50);
+  };
+
+  const handleRemoveItem = (id: string, index: number, name: string) => {
+    pendingFocusIndexRef.current = index;
+    triggerRemovalAnnouncement(`${name} removed from cart.`);
+    removeItem(id);
+  };
+
+  // Safe post-render focus management after item removal
+  useEffect(() => {
+    if (pendingFocusIndexRef.current === null) return;
+    const targetIdx = pendingFocusIndexRef.current;
+    pendingFocusIndexRef.current = null;
+
+    if (items.length > 0) {
+      const safeIdx = Math.min(targetIdx, items.length - 1);
+      const targetBtn = removeButtonRefs.current[safeIdx];
+      if (targetBtn && typeof targetBtn.focus === 'function') {
+        targetBtn.focus();
+      }
+    } else {
+      emptyCartHeadingRef.current?.focus();
+    }
+  }, [items]);
+
+  useEffect(() => {
+    return () => {
+      if (removalReinsertTimerRef.current) clearTimeout(removalReinsertTimerRef.current);
+      if (removalClearTimerRef.current) clearTimeout(removalClearTimerRef.current);
+    };
+  }, []);
 
   // Close drawer on Escape key
   const handleKeyDown = useCallback(
@@ -228,7 +288,13 @@ export function CartDrawer() {
               <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
                 <ShoppingBag className="w-10 h-10 stroke-[1.5]" aria-hidden="true" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-1">Your cart is empty</h3>
+              <h3
+                ref={emptyCartHeadingRef}
+                tabIndex={-1}
+                className="text-lg font-bold text-slate-900 mb-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] rounded"
+              >
+                Your cart is empty
+              </h3>
               <p className="text-xs sm:text-sm text-slate-500 max-w-xs mb-6 leading-relaxed">
                 Explore our expedition-grade gear and apparel built for endurance in the backcountry.
               </p>
@@ -243,7 +309,7 @@ export function CartDrawer() {
             </div>
           ) : (
             <ul className="divide-y divide-slate-100 -my-3" aria-label="Cart items">
-              {items.map((item) => (
+              {items.map((item, idx) => (
                 <li key={item.id} className="py-4 flex gap-4 items-start">
                   {/* Item Image */}
                   <div className="relative w-20 h-20 bg-slate-50 rounded-xl overflow-hidden shrink-0 border border-slate-200/80">
@@ -276,8 +342,11 @@ export function CartDrawer() {
 
                       {/* Remove Button */}
                       <button
+                        ref={(el) => {
+                          removeButtonRefs.current[idx] = el;
+                        }}
                         type="button"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => handleRemoveItem(item.id, idx, item.name)}
                         className="text-slate-400 hover:text-rose-600 p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 shrink-0"
                         aria-label={`Remove ${item.name} from cart`}
                         title="Remove item"
@@ -435,6 +504,11 @@ export function CartDrawer() {
             </div>
           </div>
         )}
+
+        {/* Single Persistent Removal Live Region (WCAG 4.1.3) */}
+        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {removalAnnouncement}
+        </div>
       </div>
     </div>
   );

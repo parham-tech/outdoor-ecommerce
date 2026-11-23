@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ProductColorOption } from '@/types/product';
 import { formatCurrency } from '@/lib/utils/format';
 import { useCart } from '@/context/CartContext';
@@ -41,9 +41,45 @@ export function ProductPurchaseForm({
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addedToast, setAddedToast] = useState(false);
+  const [cartAnnouncement, setCartAnnouncement] = useState('');
+
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const announcementReinsertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const announcementClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const selectedColor = colors[selectedColorIndex];
   const hasReviews = typeof rating === 'number' && rating > 0 && typeof reviewCount === 'number';
+
+  const triggerCartAnnouncement = (message: string) => {
+    if (announcementReinsertTimerRef.current) {
+      clearTimeout(announcementReinsertTimerRef.current);
+      announcementReinsertTimerRef.current = null;
+    }
+    if (announcementClearTimerRef.current) {
+      clearTimeout(announcementClearTimerRef.current);
+      announcementClearTimerRef.current = null;
+    }
+
+    setCartAnnouncement('');
+
+    announcementReinsertTimerRef.current = setTimeout(() => {
+      setCartAnnouncement(message);
+      announcementReinsertTimerRef.current = null;
+
+      announcementClearTimerRef.current = setTimeout(() => {
+        setCartAnnouncement('');
+        announcementClearTimerRef.current = null;
+      }, 3000);
+    }, 50);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (announcementReinsertTimerRef.current) clearTimeout(announcementReinsertTimerRef.current);
+      if (announcementClearTimerRef.current) clearTimeout(announcementClearTimerRef.current);
+    };
+  }, []);
 
   const handleAddToCart = () => {
     if (!inStock || !isHydrated) return;
@@ -58,8 +94,22 @@ export function ProductPurchaseForm({
     });
 
     if (wasAdded) {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       setAddedToast(true);
-      setTimeout(() => setAddedToast(false), 2200);
+      toastTimerRef.current = setTimeout(() => {
+        setAddedToast(false);
+        toastTimerRef.current = null;
+      }, 2200);
+
+      const itemDesc = [
+        quantity > 1 ? `${quantity} items of` : '',
+        productName,
+        colors.length > 0 && selectedColor ? `in ${selectedColor.name}` : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+
+      triggerCartAnnouncement(`${itemDesc} added to cart.`);
     }
   };
 
@@ -339,6 +389,11 @@ export function ProductPurchaseForm({
           SKU: {sku} · Sample product content for demonstration
         </p>
       )}
+
+      {/* Single Persistent Live Region for Screen Reader Cart Feedback (WCAG 4.1.3) */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {cartAnnouncement}
+      </div>
     </section>
   );
 }

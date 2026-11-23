@@ -1,7 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ProductReviewsSummary, ProductSampleReview } from '@/types/product';
+
+function getVisibleFocusableElements(container: HTMLElement): HTMLElement[] {
+  const selector =
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+    (el) =>
+      !el.hasAttribute('disabled') &&
+      el.getAttribute('aria-hidden') !== 'true' &&
+      el.tabIndex >= 0 &&
+      (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0)
+  );
+}
 
 export interface ProductReviewsSectionProps {
   productName: string;
@@ -19,6 +31,79 @@ export function ProductReviewsSection({
   const [helpfulVoted, setHelpfulVoted] = useState<Record<string, boolean>>({});
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
   const [hasWrittenReview, setHasWrittenReview] = useState(false);
+
+  const writeReviewButtonRef = useRef<HTMLButtonElement | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
+  const confirmationRef = useRef<HTMLDivElement | null>(null);
+
+  const handleCloseModal = useCallback(() => {
+    setIsWriteModalOpen(false);
+    writeReviewButtonRef.current?.focus();
+  }, []);
+
+  const handleSubmitReview = useCallback(() => {
+    setHasWrittenReview(true);
+    setIsWriteModalOpen(false);
+  }, []);
+
+  // Focus the confirmation status message after successful review submission
+  useEffect(() => {
+    if (hasWrittenReview) {
+      confirmationRef.current?.focus();
+    }
+  }, [hasWrittenReview]);
+
+  // Manage focus, scroll lock, and keyboard interactions when modal is open
+  useEffect(() => {
+    if (!isWriteModalOpen) return;
+
+    const timer = setTimeout(() => {
+      cancelButtonRef.current?.focus();
+    }, 50);
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleCloseModal();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = getVisibleFocusableElements(modalRef.current);
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          modalRef.current.focus();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement || !modalRef.current.contains(document.activeElement)) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement || !modalRef.current.contains(document.activeElement)) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isWriteModalOpen, handleCloseModal]);
 
   const averageRating = reviewsSummary?.averageRating ?? 4.0;
   const totalReviews = reviewsSummary?.totalReviews ?? reviews.length;
@@ -113,11 +198,18 @@ export function ProductReviewsSection({
               </p>
 
               {hasWrittenReview ? (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs font-medium text-center">
+                <div
+                  ref={confirmationRef}
+                  tabIndex={-1}
+                  role="status"
+                  aria-live="polite"
+                  className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs font-medium text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700"
+                >
                   Review submitted in demonstration mode!
                 </div>
               ) : (
                 <button
+                  ref={writeReviewButtonRef}
                   type="button"
                   onClick={() => setIsWriteModalOpen(true)}
                   className="w-full py-2.5 px-4 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
@@ -219,8 +311,14 @@ export function ProductReviewsSection({
           aria-modal="true"
           aria-labelledby="write-review-title"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+          onClick={handleCloseModal}
         >
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
+          <div
+            ref={modalRef}
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4 focus:outline-none"
+          >
             <h3 id="write-review-title" className="text-base font-bold text-slate-900">
               Write a Review (Demonstration)
             </h3>
@@ -229,19 +327,17 @@ export function ProductReviewsSection({
             </p>
             <div className="flex justify-end gap-3 pt-2">
               <button
+                ref={cancelButtonRef}
                 type="button"
-                onClick={() => setIsWriteModalOpen(false)}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                onClick={handleCloseModal}
+                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-600"
               >
                 Cancel
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setHasWrittenReview(true);
-                  setIsWriteModalOpen(false);
-                }}
-                className="px-4 py-2 bg-[#e86c1e] hover:bg-[#cf5b15] text-white rounded-lg text-xs font-bold"
+                onClick={handleSubmitReview}
+                className="px-4 py-2 bg-[#e86c1e] hover:bg-[#cf5b15] text-white rounded-lg text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2"
               >
                 Submit Demo Review
               </button>

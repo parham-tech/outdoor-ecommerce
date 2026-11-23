@@ -55,7 +55,7 @@ export default function AdminProductsPage() {
   } = useAdminProductsState();
 
   return (
-    <main id="admin-main-content" className="space-y-6">
+    <main id="main-content" tabIndex={-1} className="space-y-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500/60">
       {/* Breadcrumb Navigation */}
       <AdminBreadcrumb
         items={[

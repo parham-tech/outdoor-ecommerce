@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
       </header>
 
       {/* Main Center Login Canvas */}
-      <main id="admin-login-main" className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 my-auto">
+      <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 my-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500/60">
         {/* Brand Banner */}
         <div className="flex flex-col items-center mb-6 sm:mb-8 text-center">
           <Link
