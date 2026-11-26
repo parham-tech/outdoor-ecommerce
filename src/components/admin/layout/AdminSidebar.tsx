@@ -92,7 +92,6 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         <Link
           href="/admin/dashboard"
           className="inline-flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded p-1"
-          aria-label="ALTITUDE Admin Dashboard"
         >
           <Image
             src="/images/altitude-logo.png"
@@ -130,10 +129,13 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       >
         {NAV_SECTIONS.map((section, sIdx) => (
           <div key={sIdx} className="space-y-1">
-            <h3 className="px-3 text-[11px] font-mono tracking-wider text-slate-500 uppercase font-bold select-none">
+            <p
+              id={`admin-nav-section-${sIdx}`}
+              className="px-3 text-[11px] font-mono tracking-wider text-slate-500 uppercase font-bold select-none"
+            >
               {section.title}
-            </h3>
-            <ul className="space-y-0.5 mt-1.5">
+            </p>
+            <ul aria-labelledby={`admin-nav-section-${sIdx}`} className="space-y-0.5 mt-1.5">
               {section.items.map((item) => {
                 const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
                 const IconComponent = item.icon;

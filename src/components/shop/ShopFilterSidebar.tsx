@@ -79,7 +79,7 @@ export function ShopFilterSidebar({
               strokeWidth="2"
             />
           </svg>
-          <span>Filters</span>
+          <h2 className="text-base font-bold text-slate-900">Filters</h2>
           {activeFilterCount > 0 && (
             <span className="ml-1 bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">
               {activeFilterCount}
@@ -364,9 +364,9 @@ export function ShopFilterSidebar({
             />
           </svg>
         </div>
-        <h4 className="text-xs font-bold text-slate-900">
+        <h3 className="text-xs font-bold text-slate-900">
           Need a little direction?
-        </h4>
+        </h3>
         <p className="text-[11px] text-slate-500 leading-relaxed">
           Our outdoor team can help you find the right gear.
         </p>

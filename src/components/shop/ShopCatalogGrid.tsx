@@ -28,7 +28,10 @@ export function ShopCatalogGrid({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
-    <section className="space-y-6 w-full" aria-label="Product Catalog">
+    <section className="space-y-6 w-full" aria-labelledby="shop-catalog-heading">
+      <h2 id="shop-catalog-heading" className="sr-only">
+        Product Catalog
+      </h2>
       {/* Toolbar / Results Header */}
       <div
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200"

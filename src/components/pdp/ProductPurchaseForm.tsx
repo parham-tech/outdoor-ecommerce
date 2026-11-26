@@ -136,14 +136,15 @@ export function ProductPurchaseForm({
       {/* Star Rating Row */}
       {hasReviews ? (
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex items-center text-amber-500 text-sm tracking-tighter" aria-label={`${rating} out of 5 stars`}>
+          <div className="flex items-center text-amber-500 text-sm tracking-tighter">
+            <span className="sr-only">{rating} out of 5 stars</span>
             {[1, 2, 3, 4, 5].map((star) => (
               <span key={star} aria-hidden="true">
                 {(rating ?? 0) >= star ? '★' : (rating ?? 0) >= star - 0.5 ? '★' : '☆'}
               </span>
             ))}
           </div>
-          <span className="text-xs sm:text-sm font-bold text-slate-900">{rating?.toFixed(1)}</span>
+          <span className="text-xs sm:text-sm font-bold text-slate-900" aria-hidden="true">{rating?.toFixed(1)}</span>
           <a
             href="#reviews"
             className="text-xs text-slate-500 underline hover:text-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 rounded-xs"

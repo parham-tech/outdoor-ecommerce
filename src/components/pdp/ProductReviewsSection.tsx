@@ -190,9 +190,9 @@ export function ProductReviewsSection({
 
             {/* Write a Review Subbox */}
             <div className="mt-8 pt-6 border-t border-slate-100">
-              <h4 className="text-xs font-bold text-slate-900 mb-1">
+              <h3 className="text-xs font-bold text-slate-900 mb-1">
                 Been out there with the {productName}?
-              </h4>
+              </h3>
               <p className="text-xs text-slate-500 mb-4 leading-relaxed">
                 Share what worked for your adventure.
               </p>
@@ -263,7 +263,8 @@ export function ProductReviewsSection({
                       <time className="text-xs text-slate-600 font-normal">{rev.date}</time>
                     </div>
 
-                    <div className="flex text-amber-500 text-xs mb-2 tracking-tight" aria-label={`${rev.rating} out of 5 stars`}>
+                    <div className="flex text-amber-500 text-xs mb-2 tracking-tight">
+                      <span className="sr-only">{rev.rating} out of 5 stars</span>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} aria-hidden="true">
                           {rev.rating >= star ? '★' : '☆'}
@@ -271,7 +272,7 @@ export function ProductReviewsSection({
                       ))}
                     </div>
 
-                    <h4 className="text-sm font-bold text-slate-900 mb-1.5">{rev.title}</h4>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1.5">{rev.title}</h3>
                     <p className="text-xs text-slate-600 leading-relaxed mb-3">{rev.content}</p>
 
                     <button

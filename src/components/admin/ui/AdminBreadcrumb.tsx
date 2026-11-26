@@ -20,7 +20,6 @@ export function AdminBreadcrumb({ items, className }: AdminBreadcrumbProps) {
           <Link
             href="/admin/dashboard"
             className="flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded p-0.5"
-            aria-label="Admin Dashboard Home"
           >
             <Home className="w-3.5 h-3.5" aria-hidden="true" />
             <span className="sr-only sm:not-sr-only">Console</span>

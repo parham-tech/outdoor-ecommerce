@@ -53,9 +53,12 @@ export const DEFAULT_FEATURES: FeatureItem[] = [
 export function FeaturesBar({ icons = {}, features = DEFAULT_FEATURES }: FeaturesBarProps) {
   return (
     <section
-      aria-label="Store Guarantees and Services"
+      aria-labelledby="features-bar-heading"
       className="w-full bg-[#F3F3F3] border-b border-black/5 py-8 sm:py-10 lg:py-12"
     >
+      <h2 id="features-bar-heading" className="sr-only">
+        Store Guarantees and Services
+      </h2>
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid grid-cols-6 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-8 items-start">          {features.map((item, index) => {
           const customIcon = icons[item.id];

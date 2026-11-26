@@ -118,7 +118,10 @@ export function ProductCard({
 
             {/* Customer Rating */}
             {hasValidReviews && (
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-0.5" aria-label={`${product.rating} out of 5 stars`}>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-0.5">
+                <span className="sr-only">
+                  {product.rating} out of 5 stars based on {product.reviewCount} reviews
+                </span>
                 <div className="flex text-amber-400 text-xs tracking-tighter" aria-hidden="true">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span key={star}>
@@ -130,7 +133,7 @@ export function ProductCard({
                     </span>
                   ))}
                 </div>
-                <span className="text-[11px] text-slate-600">
+                <span className="text-[11px] text-slate-600" aria-hidden="true">
                   ({product.reviewCount})
                 </span>
               </div>
@@ -190,7 +193,6 @@ export function ProductCard({
     <Link
       href={`/products/${product.slug}`}
       className="group flex flex-col bg-white rounded-xl border border-neutral-200/90 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E4D36] focus-visible:ring-offset-2"
-      aria-label={`View ${product.name}, priced at ${formatCurrency(product.priceInCents)}`}
     >
       {/* Top Image Container */}
       <div className="relative aspect-square w-full bg-[#F4F4F4] flex items-center justify-center p-4 overflow-hidden">
@@ -215,7 +217,10 @@ export function ProductCard({
           {/* Rating Row with Honest Fallback */}
           <div className="mt-1 h-5 flex items-center">
             {hasValidReviews ? (
-              <div className="flex items-center gap-1.5" aria-label={`${product.rating} out of 5 stars based on ${product.reviewCount} reviews`}>
+              <div className="flex items-center gap-1.5">
+                <span className="sr-only">
+                  {product.rating} out of 5 stars based on {product.reviewCount} reviews
+                </span>
                 <div className="flex items-center text-amber-500" aria-hidden="true">
                   {[1, 2, 3, 4, 5].map((starIndex) => (
                     <svg
@@ -233,7 +238,7 @@ export function ProductCard({
                     </svg>
                   ))}
                 </div>
-                <span className="text-xs text-slate-600">
+                <span className="text-xs text-slate-600" aria-hidden="true">
                   ({product.reviewCount})
                 </span>
               </div>
