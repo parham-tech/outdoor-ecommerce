@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { Suspense, useCallback, useState, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ShopNotificationBar } from '@/components/shop/ShopNotificationBar';
 import { ShopBreadcrumbs } from '@/components/shop/ShopBreadcrumbs';
 import { ShopHeroBanner } from '@/components/shop/ShopHeroBanner';
@@ -8,11 +9,22 @@ import { ShopCategoryPills } from '@/components/shop/ShopCategoryPills';
 import { ShopFilterSidebar } from '@/components/shop/ShopFilterSidebar';
 import { ShopCatalogGrid, SortOption } from '@/components/shop/ShopCatalogGrid';
 import { ShopTrustBar } from '@/components/shop/ShopTrustBar';
-import { MOCK_SHOP_PRODUCTS } from '@/data/shopCatalog';
+import {
+  MOCK_SHOP_PRODUCTS,
+  resolveShopCategoryFromParam,
+  getShopCategorySlug,
+} from '@/data/shopCatalog';
 
-export default function ShopPage() {
+function ShopPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  const selectedCategory = useMemo(
+    () => resolveShopCategoryFromParam(categoryParam),
+    [categoryParam]
+  );
+
   // State for filtering and sorting
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 400]);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
@@ -20,6 +32,22 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState<SortOption>('recommended');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
+
+  const handleSelectCategory = useCallback(
+    (nextCategory: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      const slug = getShopCategorySlug(nextCategory);
+      if (slug) {
+        params.set('category', slug);
+      } else {
+        params.delete('category');
+      }
+      const query = params.toString();
+      setCurrentPage(1);
+      router.push(query ? `/shop?${query}` : '/shop', { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   // Toggle activity filter
   const handleToggleActivity = (activity: string) => {
@@ -36,13 +64,19 @@ export default function ShopPage() {
   };
 
   // Reset all active filters
-  const handleResetFilters = () => {
-    setSelectedCategory('');
+  const handleResetFilters = useCallback(() => {
     setPriceRange([0, 400]);
     setSelectedActivities([]);
     setSelectedFeatures([]);
     setMinRating(null);
-  };
+    setCurrentPage(1);
+    if (searchParams.get('category')) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('category');
+      const query = params.toString();
+      router.push(query ? `/shop?${query}` : '/shop', { scroll: false });
+    }
+  }, [router, searchParams]);
 
   // Calculate active filter count
   const activeFilterCount =
@@ -130,7 +164,7 @@ export default function ShopPage() {
       {/* 5. Quick Category Pills Rail */}
       <ShopCategoryPills
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={handleSelectCategory}
       />
 
       {/* 6. Main Catalog Content Area */}
@@ -177,7 +211,7 @@ export default function ShopPage() {
           <div className="hidden lg:block lg:col-span-1 sticky top-24">
             <ShopFilterSidebar
               selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
+              onSelectCategory={handleSelectCategory}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               selectedActivities={selectedActivities}
@@ -200,7 +234,7 @@ export default function ShopPage() {
               <ShopFilterSidebar
                 selectedCategory={selectedCategory}
                 onSelectCategory={(cat) => {
-                  setSelectedCategory(cat);
+                  handleSelectCategory(cat);
                   setIsMobileFilterOpen(false);
                 }}
                 priceRange={priceRange}
@@ -235,5 +269,19 @@ export default function ShopPage() {
       {/* 7. Trust Value Props Bar */}
       <ShopTrustBar />
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white text-slate-600 text-sm">
+          Loading shop catalog…
+        </div>
+      }
+    >
+      <ShopPageContent />
+    </Suspense>
   );
 }

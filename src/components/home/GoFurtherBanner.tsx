@@ -3,11 +3,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export interface GoFurtherBannerProps {
-  /** Optional custom CTA destination; defaults to canonical catalog '/products' */
+  /** Optional custom CTA destination; defaults to canonical catalog '/shop' */
   ctaHref?: string;
 }
 
-export function GoFurtherBanner({ ctaHref = '/products' }: GoFurtherBannerProps) {
+export function GoFurtherBanner({ ctaHref = '/shop' }: GoFurtherBannerProps) {
   return (
     <section
       aria-labelledby="go-further-banner-heading"

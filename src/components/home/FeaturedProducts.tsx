@@ -12,7 +12,7 @@ export interface FeaturedProductsProps {
 export function FeaturedProducts({
   products,
   title = 'Featured Products',
-  viewAllHref = '/products',
+  viewAllHref = '/shop',
 }: FeaturedProductsProps) {
   return (
     <section

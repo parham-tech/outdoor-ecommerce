@@ -18,28 +18,28 @@ const DEFAULT_CATEGORIES: CategoryCardItem[] = [
   {
     id: 'tents-shelters',
     name: 'Tents & Shelters',
-    href: '#catalog',
+    href: '/shop?category=tents-shelters',
     imageSrc: '/images/categories/tents-shelters.jpg',
     imageAlt: 'Backpacking tent pitched on an alpine ridge at sunrise',
   },
   {
-    id: 'backpacks-packs',
+    id: 'backpacks',
     name: 'Backpacks & Packs',
-    href: '#catalog',
+    href: '/shop?category=backpacks',
     imageSrc: '/images/categories/backpacks-packs.jpg',
     imageAlt: 'Technical expedition backpack resting on a rocky mountain summit',
   },
   {
-    id: 'camp-kitchen',
-    name: 'Camp Kitchen',
-    href: '#catalog',
+    id: 'camping-kitchen',
+    name: 'Camping Kitchen',
+    href: '/shop?category=camping-kitchen',
     imageSrc: '/images/categories/camp-kitchen.jpg',
     imageAlt: 'Camp stove and cookware set on a mountain peak at morning light',
   },
   {
-    id: 'lighting-accessories',
-    name: 'Lighting & Lanterns',
-    href: '#catalog',
+    id: 'lighting',
+    name: 'Lighting',
+    href: '/shop?category=lighting',
     imageSrc: '/images/categories/lighting-accessories.jpg',
     imageAlt: 'Glowing vintage lantern overlooking alpine mountains at sunset',
   },
@@ -73,16 +73,24 @@ export function FeaturedCategories({
             <Link
               key={category.id}
               href={category.href}
-              className="group block relative lg:aspect-square  aspect-[4/3] sm:aspect-video overflow-hidden rounded-2xl bg-neutral-100 shadow-xs hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E4D36] focus-visible:ring-offset-2"
-              aria-label={`Shop ${category.name}`}
+              className="group block relative lg:aspect-square aspect-[4/3] sm:aspect-video overflow-hidden rounded-2xl bg-neutral-100 shadow-xs hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2E4D36] focus-visible:ring-offset-2"
             >
               <Image
                 src={category.imageSrc}
-                alt={category.imageAlt}
+                alt=""
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
               />
+              <div
+                className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/35 to-transparent pointer-events-none"
+                aria-hidden="true"
+              />
+              <div className="relative z-10 h-full flex items-end p-3.5 sm:p-4">
+                <h3 className="text-sm sm:text-base font-bold text-white leading-tight drop-shadow-xs">
+                  {category.name}
+                </h3>
+              </div>
             </Link>
           ))}
         </div>

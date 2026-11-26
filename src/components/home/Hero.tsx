@@ -2,11 +2,11 @@ import React from 'react';
 import { Button } from '@/components/ui/Button';
 
 export interface HeroProps {
-  /** Optional custom CTA destination; defaults to in-page '#catalog' */
+  /** Optional custom CTA destination; defaults to '/shop' */
   ctaHref?: string;
 }
 
-export function Hero({ ctaHref = '#catalog' }: HeroProps) {
+export function Hero({ ctaHref = '/shop' }: HeroProps) {
   return (
     <section
       aria-label="Hero Showcase"

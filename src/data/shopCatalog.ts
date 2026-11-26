@@ -15,6 +15,35 @@ export const SHOP_CATEGORIES: CategoryFacet[] = [
   { id: 'lighting', name: 'Lighting', count: 9 },
 ];
 
+/**
+ * Resolves a `?category=` URL slug against SHOP_CATEGORIES.
+ * Returns the canonical category name (or '' for 'all' / invalid values).
+ */
+export function resolveShopCategoryFromParam(param: string | null): string {
+  if (!param) return '';
+  const normalized = param.trim().toLowerCase();
+  if (!normalized || normalized === 'all') return '';
+
+  const match = SHOP_CATEGORIES.find(
+    (cat) => cat.id !== 'all' && cat.id.toLowerCase() === normalized
+  );
+  return match ? match.name : '';
+}
+
+/**
+ * Returns the URL slug for a SHOP_CATEGORIES display name, or null for All gear.
+ */
+export function getShopCategorySlug(categoryName: string): string | null {
+  if (!categoryName) return null;
+  const normalized = categoryName.trim().toLowerCase();
+  if (!normalized || normalized === 'all gear') return null;
+
+  const match = SHOP_CATEGORIES.find(
+    (cat) => cat.id !== 'all' && cat.name.toLowerCase() === normalized
+  );
+  return match ? match.id : null;
+}
+
 export const ACTIVITY_FACETS = [
   'Camping',
   'Hiking & trekking',

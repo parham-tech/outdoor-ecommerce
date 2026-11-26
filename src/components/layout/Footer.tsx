@@ -8,10 +8,10 @@ interface FooterLinkItem {
 }
 
 const SHOP_LINKS: readonly FooterLinkItem[] = [
-  { label: 'Tents & Shelters', href: '/shop' },
-  { label: 'backpacks', href: '/shop' },
-  { label: 'Camping Kitchen', href: '/shop' },
-  { label: 'Lightning', href: '/shop' },
+  { label: 'Tents & Shelters', href: '/shop?category=tents-shelters' },
+  { label: 'Backpacks', href: '/shop?category=backpacks' },
+  { label: 'Camping Kitchen', href: '/shop?category=camping-kitchen' },
+  { label: 'Lighting', href: '/shop?category=lighting' },
 ] as const;
 
 const ABOUT_LINKS: readonly FooterLinkItem[] = [
