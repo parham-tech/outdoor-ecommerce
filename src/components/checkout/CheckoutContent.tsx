@@ -102,7 +102,8 @@ const CHECKOUT_ERROR_KEY_TO_DOM_ID: Record<keyof FormErrors, string> = {
 
 function validateForm(
   customer: CustomerContact,
-  address: ShippingAddress
+  address: ShippingAddress,
+  isSameRecipient: boolean
 ): FormErrors {
   const errors: FormErrors = {};
 
@@ -114,7 +115,9 @@ function validateForm(
   }
   if (!customer.phone.trim()) errors.phone = 'Phone number is required.';
 
-  if (!address.fullName.trim()) errors.shipFullName = 'Full name is required.';
+  if (!isSameRecipient && !address.fullName.trim()) {
+    errors.shipFullName = 'Full name is required.';
+  }
   if (!address.streetAddress.trim()) errors.streetAddress = 'Street address is required.';
   if (!address.city.trim()) errors.city = 'City is required.';
   if (!address.state.trim()) errors.state = 'State / Province is required.';
@@ -146,6 +149,16 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
     email: authCustomer?.email || '',
     phone: authCustomer?.phone || '',
   }));
+
+  const [isSameRecipient, setIsSameRecipient] = useState<boolean>(() => {
+    const savedShipName = authCustomer?.savedAddress?.fullName?.trim();
+    const contactName = authCustomer?.fullName?.trim();
+    if (savedShipName && contactName && savedShipName !== contactName) {
+      return false;
+    }
+    return true;
+  });
+
   const [address, setAddress] = useState<ShippingAddress>(() => ({
     fullName: authCustomer?.savedAddress?.fullName || authCustomer?.fullName || '',
     streetAddress: authCustomer?.savedAddress?.streetAddress || '',
@@ -156,12 +169,26 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
     country: authCustomer?.savedAddress?.country || 'US',
   }));
 
+  // Preserve a separately entered recipient name when toggling back and forth
+  const customRecipientNameRef = useRef<string | null>(
+    (() => {
+      const savedShipName = authCustomer?.savedAddress?.fullName?.trim();
+      const contactName = authCustomer?.fullName?.trim();
+      if (savedShipName && contactName && savedShipName !== contactName) {
+        return authCustomer?.savedAddress?.fullName || null;
+      }
+      return null;
+    })()
+  );
+
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [validationCount, setValidationCount] = useState(0);
   const pendingErrorFocusRef = useRef<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
   const isSubmittingRef = useRef(false);
+  const hasSubmittedOrderRef = useRef(false);
   const errorBannerRef = useRef<HTMLDivElement>(null);
 
   // Focus the first invalid field only after React commits DOM error attributes
@@ -174,9 +201,9 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
     }
   }, [validationCount]);
 
-  // Empty cart redirect — deterministic once hydrated
+  // Empty cart redirect — deterministic once hydrated, skipped after successful order placement
   useEffect(() => {
-    if (isHydrated && items.length === 0) {
+    if (isHydrated && items.length === 0 && !hasSubmittedOrderRef.current) {
       router.replace('/cart');
     }
   }, [isHydrated, items.length, router]);
@@ -186,18 +213,45 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
       const { name, value } = e.target;
       setCustomer((prev) => ({ ...prev, [name]: value }));
       setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+
+      if (name === 'fullName' && isSameRecipient) {
+        setAddress((prev) => ({ ...prev, fullName: value }));
+        setFieldErrors((prev) => ({ ...prev, shipFullName: undefined }));
+      }
     },
-    []
+    [isSameRecipient]
   );
 
   const handleAddressChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value } = e.target;
+      if (name === 'fullName' && isSameRecipient) return;
+      if (name === 'fullName') {
+        customRecipientNameRef.current = value;
+      }
       setAddress((prev) => ({ ...prev, [name]: value }));
       const errorKey = name === 'fullName' ? 'shipFullName' : name;
       setFieldErrors((prev) => ({ ...prev, [errorKey]: undefined }));
     },
-    []
+    [isSameRecipient]
+  );
+
+  const handleSameRecipientChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const checked = e.target.checked;
+      setIsSameRecipient(checked);
+
+      if (checked) {
+        setAddress((prev) => ({ ...prev, fullName: customer.fullName }));
+        setFieldErrors((prev) => ({ ...prev, shipFullName: undefined }));
+      } else if (customRecipientNameRef.current !== null) {
+        setAddress((prev) => ({
+          ...prev,
+          fullName: customRecipientNameRef.current ?? '',
+        }));
+      }
+    },
+    [customer.fullName]
   );
 
   const handleSubmit = useCallback(
@@ -208,8 +262,12 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
       // Synchronous duplicate-click guard
       if (isSubmittingRef.current) return;
 
+      const effectiveAddress: ShippingAddress = isSameRecipient
+        ? { ...address, fullName: customer.fullName }
+        : address;
+
       // Validate form
-      const errors = validateForm(customer, address);
+      const errors = validateForm(customer, effectiveAddress, isSameRecipient);
       if (Object.keys(errors).length > 0) {
         const firstKey = CHECKOUT_FIELD_ORDER.find((k) => errors[k]);
         if (firstKey) {
@@ -244,12 +302,16 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
 
         const order = createOrder({
           customer,
-          shippingAddress: address,
+          shippingAddress: effectiveAddress,
           shippingTier,
           items: orderItems,
           clientPricingSummary,
           idempotencyKey,
         });
+
+        // Prevent empty-cart redirect race before navigating to confirmation
+        hasSubmittedOrderRef.current = true;
+        setIsOrderSubmitted(true);
 
         // Clear cart only after successful persistence
         clearCart();
@@ -275,14 +337,16 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
         setIsSubmitting(false);
       }
     },
-    [customer, address, items, shippingTier, idempotencyKey, clearCart, router]
+    [customer, address, isSameRecipient, items, shippingTier, idempotencyKey, clearCart, router]
   );
 
   // Loading / redirect skeleton
   if (!isHydrated || items.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-slate-500 text-sm">Redirecting to cart…</div>
+        <div className="text-slate-600 text-sm" role="status" aria-live="polite">
+          {isOrderSubmitted ? 'Order confirmed. Redirecting…' : 'Redirecting to cart…'}
+        </div>
       </div>
     );
   }
@@ -388,6 +452,22 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                   Shipping Address
                 </h2>
                 <div className="space-y-4">
+                  <div className="pt-0.5">
+                    <label
+                      htmlFor="sameAsContact"
+                      className="inline-flex items-center gap-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none py-1"
+                    >
+                      <input
+                        id="sameAsContact"
+                        type="checkbox"
+                        checked={isSameRecipient}
+                        onChange={handleSameRecipientChange}
+                        className="w-4 h-4 rounded border-slate-300 accent-[#A94900] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A94900] focus-visible:ring-offset-2 cursor-pointer"
+                      />
+                      <span>Shipping recipient is the same as contact name</span>
+                    </label>
+                  </div>
+
                   <FormField
                     label="Full Name"
                     id="shipFullName"
@@ -401,11 +481,24 @@ function CheckoutForm({ authCustomer }: { authCustomer: CustomerProfile | null }
                       autoComplete="shipping name"
                       value={address.fullName}
                       onChange={handleAddressChange}
-                      className={inputClass}
+                      readOnly={isSameRecipient}
+                      className={`${inputClass} read-only:bg-slate-100 read-only:text-slate-700 read-only:cursor-default`}
                       aria-required="true"
-                      aria-describedby={fieldErrors.shipFullName ? 'shipFullName-error' : undefined}
+                      aria-describedby={
+                        [
+                          fieldErrors.shipFullName ? 'shipFullName-error' : null,
+                          isSameRecipient ? 'shipFullName-sync-hint' : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' ') || undefined
+                      }
                       aria-invalid={fieldErrors.shipFullName ? 'true' : undefined}
                     />
+                    {isSameRecipient && (
+                      <p id="shipFullName-sync-hint" className="text-[11px] text-slate-600 mt-1">
+                        Synced with Contact Full Name. Uncheck above to enter a different recipient.
+                      </p>
+                    )}
                   </FormField>
                   <FormField
                     label="Street Address"
